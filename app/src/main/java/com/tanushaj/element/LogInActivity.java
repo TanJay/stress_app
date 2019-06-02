@@ -4,9 +4,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -23,17 +25,18 @@ import org.json.JSONObject;
 public class LogInActivity extends AppCompatActivity {
 
     public String PREFERENCE_NAME = "element";
+    public String TAG_NAME = "ELEMENT_TAG";
 
     EditText email;
     EditText password;
     Button loginButton;
-
+    TextView SignupLink;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_log_in);
 
-        if(checkLoggedIn()) startActivity(new Intent(this, MainActivity.class));
+        if(checkLoggedIn()) startActivity(new Intent(this, DailyQuoteActivity.class));
 
 
         email = findViewById(R.id.signUpUserName);
@@ -44,6 +47,13 @@ public class LogInActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 getToken();
+            }
+        });
+        SignupLink = findViewById(R.id.linkToRegister);
+        SignupLink.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), SignUpActivity.class));
             }
         });
     }
@@ -65,6 +75,7 @@ public class LogInActivity extends AppCompatActivity {
         loginButton.setEnabled(false);
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         final String url = "http://51.158.175.210:8081/user/login";
+        Log.d(TAG_NAME, "None");
 
         JSONObject jsonBody = new JSONObject();
         try {
@@ -74,17 +85,19 @@ public class LogInActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, null, new Response.Listener<JSONObject>() {
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
 
             @Override
             public void onResponse(JSONObject response) {
+                Log.d(TAG_NAME, "Response");
                 try {
                     String token = response.getString("token");
                     savePreferences(token);
                     Toast.makeText(getApplicationContext(), "Login Success", Toast.LENGTH_LONG).show();
+                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Toast.makeText(getApplicationContext(), "Login Failed", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Login Failed Json" , Toast.LENGTH_LONG).show();
                 }
                 loginButton.setEnabled(true);
 
@@ -93,7 +106,8 @@ public class LogInActivity extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 loginButton.setEnabled(true);
-                Toast.makeText(getApplicationContext(), "Login Failed", Toast.LENGTH_LONG).show();
+                Log.d(TAG_NAME, error.getMessage());
+                Toast.makeText(getApplicationContext(), "Login Failed1", Toast.LENGTH_LONG).show();
             }
         });
         requestQueue.add(jsonObjectRequest);

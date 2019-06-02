@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SignUpActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <EditText
+            android:id="@+id/signUpUserName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="User Name"
+            android:inputType="" />
+
+        <EditText
+            android:id="@+id/signUpEmail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="Email"
+            android:inputType="textEmailAddress" />
+
+        <EditText
+            android:id="@+id/signUpPhoneNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="Mobile Number"
+            android:inputType="phone" />
+
+        <EditText
+            android:id="@+id/signUpPassword"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="Password"
+            android:inputType="textPassword" />
+
+        <EditText
+            android:id="@+id/signUpConformPassword"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="Confirm Password"
+            android:inputType="textPassword" />
+
+        <EditText
+            android:id="@+id/signUpAge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="Age"
+            android:inputType="number" />
+
+        <Spinner
+            android:id="@+id/signUpGender"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:prompt="@string/Gender"
+            android:spinnerMode="dropdown"
+            android:entries="@array/genderArray"/>
+
+        <Spinner
+            android:id="@+id/signUpCountry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:prompt="@string/Country"
+            android:spinnerMode="dropdown"
+            android:entries="@array/CountryArray"/>
+
+        <Spinner
+            android:id="@+id/signUpFavMusic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:prompt="@string/Favourite_Music"
+            android:spinnerMode="dropdown"
+            android:entries="@array/FavMusicArray"/>
+
+        <Spinner
+            android:id="@+id/signUpFavArtist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:prompt="@string/Favourite_Artist"
+            android:spinnerMode="dropdown"
+            android:entries="@array/FavArtistsArray"/>
+
+        <Spinner
+            android:id="@+id/signUpFavColor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:prompt="@string/Favourite_Color"
+            android:spinnerMode="dropdown"
+            android:entries="@array/FavColorArray"/>
+
+        <Spinner
+            android:id="@+id/signUpFavFragrance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:prompt="@string/Favourite_Fragrance"
+            android:spinnerMode="dropdown"
+            android:entries="@array/FavFragranceArray"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/registerButton"
+            android:text="Register"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Already Registered.. Login Me"
+            android:id="@+id/linkToLogin"/>
+
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>

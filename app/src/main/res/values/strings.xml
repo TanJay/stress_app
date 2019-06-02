@@ -1,0 +1,77 @@
+<resources>
+    <string name="app_name">Element</string>
+
+    <string name="Gender">Gender</string>
+    <string name="Country">Country</string>
+    <string name="Favourite_Music">Favourite Music</string>
+    <string name="Favourite_Artist">Favourite Artist</string>
+    <string name="Favourite_Color">Favourite Color</string>
+    <string name="Favourite_Fragrance">Favourite Fragrance</string>
+
+    <string-array name="genderArray">
+        <item>Male</item>
+        <item>Female</item>
+        <item>Other</item>
+    </string-array>
+
+    <string-array name="CountryArray">
+        <item>Sri Lanka</item>
+        <item>India</item>
+        <item>Pakistan</item>
+        <item>Philippines</item>
+        <item>Australia</item>
+    </string-array>
+
+    <string-array name="FavMusicArray">
+        <item>River Sound</item>
+        <item>Beach Wave Sound</item>
+        <item>Rain Drop Sound</item>
+        <item>Animal Voice Sound</item>
+        <item>Bird Voice Sound</item>
+    </string-array>
+
+    <string-array name="FavArtistsArray">
+        <item>Bathiya Santhush</item>
+        <item>Sean paul</item>
+        <item>Selena Gomas</item>
+        <item>Ridma Jayakody</item>
+        <item>Kithsiri Pieris</item>
+    </string-array>
+
+    <string-array name="FavColorArray">
+        <item>Pink</item>
+        <item>Yellow</item>
+        <item>Blue</item>
+        <item>Black</item>
+        <item></item>
+    </string-array>
+
+    <string-array name="FavFragranceArray">
+        <item>Rose</item>
+        <item>Bluberry</item>
+        <item>Fresh Leaves</item>
+        <item>New Book</item>
+        <item>Petrol</item>
+    </string-array>
+
+    <string-array name="PlayTimeDurationArray">
+        <item>Rose</item>
+        <item>Bluberry</item>
+        <item>Fresh Leaves</item>
+        <item>New Book</item>
+        <item>Petrol</item>
+    </string-array>
+
+    <string-array name="preferencesArray">
+        <item>Music</item>
+        <item>Beach</item>
+        <item>River</item>
+        <item>Night</item>
+        <item>Fire</item>
+    </string-array>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
+</resources>

@@ -1,6 +1,8 @@
 package com.tanushaj.element;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -15,22 +17,41 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.samsung.android.sdk.accessory.SAAgentV2;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.tensorflow.lite.Interpreter;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements HomeFragment.OnFragmentInteractionListener, ProfileFragment.OnFragmentInteractionListener, SessionFragment.OnFragmentInteractionListener {
     public String TAG = "ELEMENT_TAG";
+    public String TAG_NAME = "ELEMENT_TAG";
+    public String PREFERENCE_NAME = "element";
+
+    Interpreter tflite;
 
     private static MessageAdapter mMessageAdapter;
     private ConsumerService mConsumerService = null;
     private SAAgentV2.RequestAgentCallback mAgentCallback = new SAAgentV2.RequestAgentCallback() {
         @Override
         public void onAgentAvailable(SAAgentV2 agent) {
-            mConsumerService = (ConsumerService)agent;
+            mConsumerService = (ConsumerService) agent;
         }
 
         @Override
@@ -38,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
             Log.e(TAG, "Agent initialization error: " + errorCode + ". ErrorMsg: " + message);
         }
     };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,13 +74,13 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
                         Fragment selectedFragment = null;
                         switch (item.getItemId()) {
                             case R.id.navigation_songs:
-                                selectedFragment = HomeFragment.newInstance("hh","hh");
+                                selectedFragment = HomeFragment.newInstance("hh", "hh");
                                 break;
                             case R.id.navigation_artists:
                                 selectedFragment = SessionFragment.newInstance();
                                 break;
                             case R.id.navigation_albums:
-                                selectedFragment = ProfileFragment.newInstance("pp","pp");
+                                selectedFragment = ProfileFragment.newInstance("pp", "pp");
                                 break;
                         }
                         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -70,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
 
         //Manually displaying the first fragment - one time only
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.container, HomeFragment.newInstance("hh","hh"));
+        transaction.replace(R.id.container, HomeFragment.newInstance("hh", "hh"));
         transaction.commit();
 
         //Used to select an item programmatically
@@ -83,6 +105,72 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
 //        mMessageListView.setAdapter(mMessageAdapter);
 
     }
+
+    public void predictDataByApi(WearableHRV[] hrvData) {
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        final String url = "http://51.158.175.210:8081/hrv/";
+        Log.d(TAG_NAME, "None");
+
+        JSONArray hrvs = new JSONArray();
+        for (WearableHRV hrv : hrvData) {
+            JSONObject object = new JSONObject();
+            try {
+                object.put("heartbeat", hrv.getHR());
+                object.put("hrv", hrv.getrR());
+                object.put("timestamp", hrv.getDateTime());
+                hrvs.put(object);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        JSONObject jsonBody = new JSONObject();
+        try {
+            jsonBody.put("rr_data", hrvs);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
+
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.d(TAG_NAME, "Response");
+                try {
+                    String message = response.getString("message");
+                    Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+                    startActivity(new Intent(getApplicationContext(), LogInActivity.class));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Toast.makeText(getApplicationContext(), "Register Failed Json", Toast.LENGTH_LONG).show();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d(TAG_NAME, error.getMessage());
+                Toast.makeText(getApplicationContext(), "Register Failed1", Toast.LENGTH_LONG).show();
+            }
+        }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> map = new HashMap<>();
+                map.put("Authorization", getToken());
+                map.put("Content-Type", "application/json");
+                return super.getHeaders();
+            }
+        };
+        requestQueue.add(jsonObjectRequest);
+
+    }
+
+    private String getToken(){
+        SharedPreferences prefs = getSharedPreferences(PREFERENCE_NAME, MODE_PRIVATE);
+        String loggedIn = prefs.getString("token", "");
+        return loggedIn;
+    }
+
 
     public static void addMessage(String data) {
         mMessageAdapter.addMessage(new Message(data));

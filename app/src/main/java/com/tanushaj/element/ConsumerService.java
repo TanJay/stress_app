@@ -23,34 +23,69 @@
 
 package com.tanushaj.element;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Handler;
+import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.samsung.android.sdk.SsdkUnsupportedException;
 import com.samsung.android.sdk.accessory.SA;
+import com.samsung.android.sdk.accessory.SAAgent;
 import com.samsung.android.sdk.accessory.SAAgentV2;
 import com.samsung.android.sdk.accessory.SAPeerAgent;
 import com.samsung.android.sdk.accessory.SASocket;
 
 import java.io.IOException;
 
-public class ConsumerService extends SAAgentV2 {
-    private static final String TAG = "ELEMENT_TAG";
+public class ConsumerService extends SAAgent {
+    private static final String TAG = "HelloAccessory(C)";
     private static final Class<ServiceConnection> SASOCKET_CLASS = ServiceConnection.class;
+    private final IBinder mBinder = new LocalBinder();
     private ServiceConnection mConnectionHandler = null;
-    private Handler mHandler = new Handler();
-    private Context mContext = null;
+    Handler mHandler = new Handler();
 
-    public ConsumerService(Context context) {
-        super(TAG, context, SASOCKET_CLASS);
-        mContext = context;
+    public ConsumerService() {
+        super(TAG, SASOCKET_CLASS);
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        /****************************************************
+         * Example codes for Android O OS (startForeground) *
+         ****************************************************/
+        if (Build.VERSION.SDK_INT >= 26) {
+            NotificationManager notificationManager = null;
+            String channel_id = "sample_channel_01";
+
+            if(notificationManager == null) {
+                String channel_name = "Accessory_SDK_Sample";
+                notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                NotificationChannel notiChannel = new NotificationChannel(channel_id, channel_name, NotificationManager.IMPORTANCE_LOW);
+                notificationManager.createNotificationChannel(notiChannel);
+            }
+
+            int notifyID = 1;
+            Notification notification = new Notification.Builder(this.getBaseContext(),channel_id)
+                    .setContentTitle(TAG)
+                    .setContentText("")
+                    .setChannelId(channel_id)
+                    .build();
+
+            startForeground(notifyID, notification);
+        }
 
         SA mAccessory = new SA();
         try {
-            mAccessory.initialize(mContext);
+            mAccessory.initialize(this);
         } catch (SsdkUnsupportedException e) {
             // try to handle SsdkUnsupportedException
             if (processUnsupportedException(e) == true) {
@@ -63,22 +98,39 @@ public class ConsumerService extends SAAgentV2 {
              * without using this SDK, or you may want to notify user and close your application gracefully
              * (release resources, stop Service threads, close UI thread, etc.)
              */
+            stopSelf();
         }
     }
 
     @Override
+    public IBinder onBind(Intent intent) {
+        return mBinder;
+    }
+
+    @Override
+    public void onDestroy() {
+        /***************************************************
+         * Example codes for Android O OS (stopForeground) *
+         ***************************************************/
+        if (Build.VERSION.SDK_INT >= 26) {
+            stopForeground(true);
+        }
+        super.onDestroy();
+    }
+
+    @Override
     protected void onFindPeerAgentsResponse(SAPeerAgent[] peerAgents, int result) {
-        if ((result == SAAgentV2.PEER_AGENT_FOUND) && (peerAgents != null)) {
+        if ((result == SAAgent.PEER_AGENT_FOUND) && (peerAgents != null)) {
             for(SAPeerAgent peerAgent:peerAgents)
                 requestServiceConnection(peerAgent);
-        } else if (result == SAAgentV2.FINDPEER_DEVICE_NOT_CONNECTED) {
+        } else if (result == SAAgent.FINDPEER_DEVICE_NOT_CONNECTED) {
             Toast.makeText(getApplicationContext(), "FINDPEER_DEVICE_NOT_CONNECTED", Toast.LENGTH_LONG).show();
             updateTextView("Disconnected");
-        } else if (result == SAAgentV2.FINDPEER_SERVICE_NOT_FOUND) {
+        } else if (result == SAAgent.FINDPEER_SERVICE_NOT_FOUND) {
             Toast.makeText(getApplicationContext(), "FINDPEER_SERVICE_NOT_FOUND", Toast.LENGTH_LONG).show();
             updateTextView("Disconnected");
         } else {
-            Toast.makeText(getApplicationContext(), "No Peers Found", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "No Peer", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -91,16 +143,16 @@ public class ConsumerService extends SAAgentV2 {
 
     @Override
     protected void onServiceConnectionResponse(SAPeerAgent peerAgent, SASocket socket, int result) {
-        if (result == SAAgentV2.CONNECTION_SUCCESS) {
+        if (result == SAAgent.CONNECTION_SUCCESS) {
             this.mConnectionHandler = (ServiceConnection) socket;
             updateTextView("Connected");
-        } else if (result == SAAgentV2.CONNECTION_ALREADY_EXIST) {
+        } else if (result == SAAgent.CONNECTION_ALREADY_EXIST) {
             updateTextView("Connected");
-            Toast.makeText(mContext, "CONNECTION_ALREADY_EXIST", Toast.LENGTH_LONG).show();
-        } else if (result == SAAgentV2.CONNECTION_DUPLICATE_REQUEST) {
-            Toast.makeText(mContext, "CONNECTION_DUPLICATE_REQUEST", Toast.LENGTH_LONG).show();
+            Toast.makeText(getBaseContext(), "CONNECTION_ALREADY_EXIST", Toast.LENGTH_LONG).show();
+        } else if (result == SAAgent.CONNECTION_DUPLICATE_REQUEST) {
+            Toast.makeText(getBaseContext(), "CONNECTION_DUPLICATE_REQUEST", Toast.LENGTH_LONG).show();
         } else {
-            Toast.makeText(mContext,"Connection Failure", Toast.LENGTH_LONG).show();
+            Toast.makeText(getBaseContext(), "No connection", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -116,8 +168,9 @@ public class ConsumerService extends SAAgentV2 {
         mHandler.post(new Runnable() {
             @Override
             public void run() {
+//                Log.d(TAG_Name)
                 if (peers != null) {
-                    if (status == SAAgentV2.PEER_AGENT_AVAILABLE) {
+                    if (status == SAAgent.PEER_AGENT_AVAILABLE) {
                         Toast.makeText(getApplicationContext(), "PEER_AGENT_AVAILABLE", Toast.LENGTH_LONG).show();
                     } else {
                         Toast.makeText(getApplicationContext(), "PEER_AGENT_UNAVAILABLE", Toast.LENGTH_LONG).show();
@@ -193,6 +246,7 @@ public class ConsumerService extends SAAgentV2 {
              * without using this SDK, or you may want to notify user and close your app gracefully (release
              * resources, stop Service threads, close UI thread, etc.)
              */
+            stopSelf();
         } else if (errType == SsdkUnsupportedException.LIBRARY_NOT_INSTALLED) {
             Log.e(TAG, "You need to install Samsung Accessory SDK to use this application.");
         } else if (errType == SsdkUnsupportedException.LIBRARY_UPDATE_IS_REQUIRED) {

@@ -12,10 +12,11 @@
         android:background="@drawable/download">
 
         <TextView
+            android:id="@+id/dailyQuote"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Daily Quote"
-            android:paddingBottom="50dp"/>
+            android:paddingBottom="50dp"
+            android:text="Daily Quote" />
 
         <TextView
             android:layout_width="wrap_content"

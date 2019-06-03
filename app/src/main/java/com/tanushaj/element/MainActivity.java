@@ -1,10 +1,14 @@
 package com.tanushaj.element;
 
+import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
@@ -39,26 +43,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements HomeFragment.OnFragmentInteractionListener, ProfileFragment.OnFragmentInteractionListener, SessionFragment.OnFragmentInteractionListener {
+public class MainActivity extends Activity implements HomeFragment.OnFragmentInteractionListener, ProfileFragment.OnFragmentInteractionListener, SessionFragment.OnFragmentInteractionListener {
     public String TAG = "ELEMENT_TAG";
     public String TAG_NAME = "ELEMENT_TAG";
     public String PREFERENCE_NAME = "element";
 
     Interpreter tflite;
 
-    private static MessageAdapter mMessageAdapter;
+    private boolean mIsBound = false;
     private ConsumerService mConsumerService = null;
-    private SAAgentV2.RequestAgentCallback mAgentCallback = new SAAgentV2.RequestAgentCallback() {
-        @Override
-        public void onAgentAvailable(SAAgentV2 agent) {
-            mConsumerService = (ConsumerService) agent;
-        }
-
-        @Override
-        public void onError(int errorCode, String message) {
-            Log.e(TAG, "Agent initialization error: " + errorCode + ". ErrorMsg: " + message);
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,26 +76,39 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
                                 selectedFragment = ProfileFragment.newInstance("pp", "pp");
                                 break;
                         }
-                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                        transaction.replace(R.id.container, selectedFragment);
-                        transaction.commit();
+//                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+//                        transaction.replace(R.id.container, selectedFragment);
+//                        transaction.commit();
                         return true;
                     }
                 });
 
         //Manually displaying the first fragment - one time only
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.container, HomeFragment.newInstance("hh", "hh"));
-        transaction.commit();
+//        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+//        transaction.replace(R.id.container, HomeFragment.newInstance("hh", "hh"));
+//        transaction.commit();
 
         //Used to select an item programmatically
         bottomNavigationView.getMenu().getItem(2).setChecked(true);
 
 
-        mMessageAdapter = new MessageAdapter();
-        SAAgentV2.requestAgent(getApplicationContext(), ConsumerService.class.getName(), mAgentCallback);
+        mIsBound = bindService(new Intent(MainActivity.this, ConsumerService.class), mConnection, Context.BIND_AUTO_CREATE);
+        Log.d(TAG_NAME, "Find");
 
-//        mMessageListView.setAdapter(mMessageAdapter);
+        if (mIsBound == true && mConsumerService != null) {
+                    mConsumerService.findPeers();
+                    Log.d(TAG_NAME, "Finding Peers");
+
+
+        }
+
+        if (mIsBound == true && mConsumerService != null) {
+            if (mConsumerService.sendData("Hello Accessory!")) {
+            } else {
+
+                Toast.makeText(getApplicationContext(), "Connected", Toast.LENGTH_LONG).show();
+            }
+        }
 
     }
 
@@ -173,26 +179,11 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
 
 
     public static void addMessage(String data) {
-        mMessageAdapter.addMessage(new Message(data));
+        Log.d("TAGGGGGGG", data);
+
+//        mMessageAdapter.addMessage(new Message(data));
     }
 
-    public static void updateTextView(final String str) {
-//        mTextView.setText(str);
-    }
-
-    @Override
-    protected void onDestroy() {
-        // Clean up connections
-        if (mConsumerService != null) {
-            if (mConsumerService.closeConnection() == false) {
-//                updateTextView("Disconnected");
-                mMessageAdapter.clear();
-            }
-            mConsumerService.releaseAgent();
-            mConsumerService = null;
-        }
-        super.onDestroy();
-    }
 
 
     @Override
@@ -200,68 +191,141 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
 
     }
 
-    private class MessageAdapter extends BaseAdapter {
-        private static final int MAX_MESSAGES_TO_DISPLAY = 20;
-        private List<Message> mMessages;
-
-        public MessageAdapter() {
-            mMessages = Collections.synchronizedList(new ArrayList<Message>());
-        }
-
-        void addMessage(final Message msg) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (mMessages.size() == MAX_MESSAGES_TO_DISPLAY) {
-                        mMessages.remove(0);
-                        mMessages.add(msg);
-                    } else {
-                        mMessages.add(msg);
-                    }
-                    notifyDataSetChanged();
-//                    mMessageListView.setSelection(getCount() - 1);
-                }
-            });
-        }
-
-        void clear() {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mMessages.clear();
-                    notifyDataSetChanged();
-                }
-            });
-        }
-
-        @Override
-        public int getCount() {
-            return mMessages.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return mMessages.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return 0;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            LayoutInflater inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View messageRecordView = null;
-            if (inflator != null) {
-//                messageRecordView = inflator.inflate(R.layout.message, null);
-//                TextView tvData = (TextView) messageRecordView.findViewById(R.id.tvData);
-//                Message message = (Message) getItem(position);
-//                tvData.setText(message.data);
+    // SAAgent
+    @Override
+    protected void onDestroy() {
+        // Clean up connections
+        if (mIsBound == true && mConsumerService != null) {
+            if (mConsumerService.closeConnection() == false) {
+                updateTextView("Disconnected");
+//                mMessageAdapter.clear();
             }
-            return messageRecordView;
         }
+        // Un-bind service
+        if (mIsBound) {
+            unbindService(mConnection);
+        }
+        super.onDestroy();
     }
+
+//    public void mOnClick(View v) {
+//        switch (v.getId()) {
+//            case R.id.buttonConnect: {
+//                if (mIsBound == true && mConsumerService != null) {
+//                    mConsumerService.findPeers();
+//                }
+//                break;
+//            }
+//            case R.id.buttonDisconnect: {
+//                if (mIsBound == true && mConsumerService != null) {
+//                    if (mConsumerService.closeConnection() == false) {
+//                        updateTextView("Disconnected");
+//                        Toast.makeText(getApplicationContext(), R.string.ConnectionAlreadyDisconnected, Toast.LENGTH_LONG).show();
+//                        mMessageAdapter.clear();
+//                    }
+//                }
+//                break;
+//            }
+//            case R.id.buttonSend: {
+//                if (mIsBound == true && mConsumerService != null) {
+//                    if (mConsumerService.sendData("Hello Accessory!")) {
+//                    } else {
+//                        Toast.makeText(getApplicationContext(), R.string.ConnectionAlreadyDisconnected, Toast.LENGTH_LONG).show();
+//                    }
+//                }
+//                break;
+//            }
+//            default:
+//        }
+//    }
+
+    private final ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            mConsumerService = ((ConsumerService.LocalBinder) service).getService();
+            updateTextView("onServiceConnected");
+            Log.d("TAGGGGGGG", "updateText");
+
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName className) {
+            mConsumerService = null;
+            mIsBound = false;
+            Log.d("TAGGGGGGG", "updateText");
+
+            updateTextView("onServiceDisconnected");
+        }
+    };
+
+    public static void updateTextView(final String str) {
+//        mTextView.setText(str);
+        Log.d("TAGGGGGGG", "updateText");
+
+    }
+
+//    private class MessageAdapter extends BaseAdapter {
+//        private static final int MAX_MESSAGES_TO_DISPLAY = 20;
+//        private List<Message> mMessages;
+//
+//        public MessageAdapter() {
+//            mMessages = Collections.synchronizedList(new ArrayList<Message>());
+//        }
+//
+//        void addMessage(final Message msg) {
+//            runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    if (mMessages.size() == MAX_MESSAGES_TO_DISPLAY) {
+//                        mMessages.remove(0);
+//                        mMessages.add(msg);
+//                    } else {
+//                        mMessages.add(msg);
+//                    }
+//                    notifyDataSetChanged();
+////                    mMessageListView.setSelection(getCount() - 1);
+//                }
+//            });
+//        }
+//
+//        void clear() {
+//            runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    mMessages.clear();
+//                    notifyDataSetChanged();
+//                }
+//            });
+//        }
+//
+//        @Override
+//        public int getCount() {
+//            return mMessages.size();
+//        }
+//
+//        @Override
+//        public Object getItem(int position) {
+//            return mMessages.get(position);
+//        }
+//
+//        @Override
+//        public long getItemId(int position) {
+//            return 0;
+//        }
+//
+//        @Override
+//        public View getView(int position, View convertView, ViewGroup parent) {
+//            LayoutInflater inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//            View messageRecordView = null;
+//            if (inflator != null) {
+////                messageRecordView = inflator.inflate(R.layout.message, null);
+////                TextView tvData = (TextView) messageRecordView.findViewById(R.id.tvData);
+//                Message message = (Message) getItem(position);
+////                tvData.setText(message.data);
+//            }
+//            return messageRecordView;
+//        }
+//    }
 
     private static final class Message {
         String data;

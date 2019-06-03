@@ -27,16 +27,16 @@
             android:inputType="textPassword" />
 
         <Button
+            android:id="@+id/loginButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/registerButton"
-            android:text="Login"/>
+            android:text="Login" />
 
         <TextView
+            android:id="@+id/linkToRegister"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Not A Memeber.. SIgn UP"
-            android:id="@+id/linkToLogin"/>
+            android:text="Not A Memeber.. SIgn UP" />
 
     </LinearLayout>
 

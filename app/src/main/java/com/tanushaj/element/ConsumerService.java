@@ -38,7 +38,7 @@ import com.samsung.android.sdk.accessory.SASocket;
 import java.io.IOException;
 
 public class ConsumerService extends SAAgentV2 {
-    private static final String TAG = "HelloAccessory(C)";
+    private static final String TAG = "ELEMENT_TAG";
     private static final Class<ServiceConnection> SASOCKET_CLASS = ServiceConnection.class;
     private ServiceConnection mConnectionHandler = null;
     private Handler mHandler = new Handler();

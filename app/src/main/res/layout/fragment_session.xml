@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".SessionFragment">
 
     <LinearLayout
@@ -14,29 +14,42 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:background="@drawable/download"
+            android:orientation="vertical"
+            android:paddingLeft="50dp">
 
             <TextView
                 android:id="@+id/dayOfDays"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:paddingBottom="4dp"
+                android:paddingTop="60dp"
+                android:text="Day 02 of 10"
+                android:textColor="@color/white"
+                android:textSize="7pt" />
 
             <TextView
                 android:id="@+id/BasicLevelNo"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:paddingBottom="6dp"
+                android:text="Basic 02"
+                android:textColor="@color/white"
+                android:textSize="16pt" />
 
             <Button
+                android:id="@+id/BeginBtn"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Begin"
-                android:id="@+id/BeginBtn"/>
+                android:layout_height="25dp"
+                android:background="@drawable/round_button_white_background"
+                android:text="Begin" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_weight="2"
             android:orientation="vertical">
 
             <LinearLayout
@@ -47,20 +60,27 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="20dp">
 
                     <TextView
+                        android:id="@+id/listeningTimetxt"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:id="@+id/listeningTimetxt"
-                        android:text="Start Listening for 10 minutes"
-                        android:layout_weight="1"/>
+                        android:layout_weight="1"
+                        android:text="Start Listening \nfor 10 minutes"
+                        android:lineSpacingExtra="5pt"
+                        android:textColor="#ff7f4f" />
 
                     <Button
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
                         android:id="@+id/BeginBtn1"
-                        android:layout_weight="1"/>
+                        android:layout_width="80dp"
+                        android:layout_height="30dp"
+                        android:background="@drawable/round_button_orange_background"
+                        android:text="Begin"
+                        android:textColor="@color/white"
+                        android:layout_gravity="center_vertical"/>
                 </LinearLayout>
 
             </LinearLayout>
@@ -68,14 +88,14 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1"
+                android:layout_weight="4"
                 android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Stress Histogram"
-                    />
+                    android:textColor="#ff7f4f" />
 
                 <com.anychart.AnyChartView
                     android:id="@+id/histogramChart"

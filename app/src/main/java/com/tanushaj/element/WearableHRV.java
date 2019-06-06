@@ -5,6 +5,12 @@ public class WearableHRV {
     private Integer rR;
     private Float HR;
 
+    public WearableHRV(String dateTime, Integer rR, Float HR) {
+        this.dateTime = dateTime;
+        this.rR = rR;
+        this.HR = HR;
+    }
+
     public String getDateTime() {
         return dateTime;
     }

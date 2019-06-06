@@ -15,12 +15,12 @@
         <EditText
             android:id="@+id/signUpUserName"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="34dp"
             android:hint="User Name"
             android:inputType="" />
 
         <EditText
-            android:id="@+id/signUpEmail"
+            android:id="@+id/signUpPassword"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:hint="Password"

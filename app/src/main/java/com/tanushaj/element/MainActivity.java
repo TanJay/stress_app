@@ -1,9 +1,12 @@
 package com.tanushaj.element;
 
 import android.app.Activity;
+import android.app.Notification;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -13,6 +16,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,11 +47,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MainActivity extends Activity implements HomeFragment.OnFragmentInteractionListener, ProfileFragment.OnFragmentInteractionListener, SessionFragment.OnFragmentInteractionListener {
+import br.com.goncalves.pugnotification.notification.PugNotification;
+
+public class MainActivity extends AppCompatActivity implements HomeFragment.OnFragmentInteractionListener, ProfileFragment.OnFragmentInteractionListener, SessionFragment.OnFragmentInteractionListener {
     public String TAG = "ELEMENT_TAG";
     public String TAG_NAME = "ELEMENT_TAG";
     public String PREFERENCE_NAME = "element";
-
+ List<WearableHRV> list = new ArrayList<>();
     Interpreter tflite;
 
     private boolean mIsBound = false;
@@ -76,9 +82,9 @@ public class MainActivity extends Activity implements HomeFragment.OnFragmentInt
                                 selectedFragment = ProfileFragment.newInstance("pp", "pp");
                                 break;
                         }
-//                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-//                        transaction.replace(R.id.container, selectedFragment);
-//                        transaction.commit();
+                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                        transaction.replace(R.id.container, selectedFragment);
+                        transaction.commit();
                         return true;
                     }
                 });
@@ -92,30 +98,40 @@ public class MainActivity extends Activity implements HomeFragment.OnFragmentInt
         bottomNavigationView.getMenu().getItem(2).setChecked(true);
 
 
+
+
         mIsBound = bindService(new Intent(MainActivity.this, ConsumerService.class), mConnection, Context.BIND_AUTO_CREATE);
         Log.d(TAG_NAME, "Find");
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
+                new IntentFilter("custom-event-name"));
 
-        if (mIsBound == true && mConsumerService != null) {
-                    mConsumerService.findPeers();
-                    Log.d(TAG_NAME, "Finding Peers");
-
-
-        }
-
-        if (mIsBound == true && mConsumerService != null) {
-            if (mConsumerService.sendData("Hello Accessory!")) {
-            } else {
-
-                Toast.makeText(getApplicationContext(), "Connected", Toast.LENGTH_LONG).show();
-            }
-        }
 
     }
 
-    public void predictDataByApi(WearableHRV[] hrvData) {
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Get extra data included in the Intent
+            String message = intent.getStringExtra("message");
+//            Log.d("receiver", "Got message: " + message);
+            String[] items = message.split(",");
+            WearableHRV hrv = new WearableHRV(items[0], Integer.valueOf(items[1]), Float.parseFloat(items[2]));
+            //Date:2019-6-4 1:30:5,rrInterval:0,HR: -3
+            list.add(hrv);
+            if (list.size() == 50){
+                predictDataByApi(list);
+                list.clear();
+            }
+
+        }
+    };
+
+    public void predictDataByApi(List<WearableHRV> hrvData) {
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         final String url = "http://51.158.175.210:8081/hrv/";
-        Log.d(TAG_NAME, "None");
+//                final String url = "http://3491ba42.ngrok.io";
+
+//        Log.d(TAG_NAME, "None");
 
         JSONArray hrvs = new JSONArray();
         for (WearableHRV hrv : hrvData) {
@@ -137,15 +153,27 @@ public class MainActivity extends Activity implements HomeFragment.OnFragmentInt
             e.printStackTrace();
         }
 
+        Log.d("TAGGG",  jsonBody.toString());
+
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
 
             @Override
             public void onResponse(JSONObject response) {
-                Log.d(TAG_NAME, "Response");
+//                Log.d(TAG_NAME, "Response");
                 try {
                     String message = response.getString("message");
                     Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
-                    startActivity(new Intent(getApplicationContext(), LogInActivity.class));
+//                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                    PugNotification.with(MainActivity.this)
+                            .load()
+                            .title("Element")
+                            .message(message)
+                            .bigTextStyle("Stress Level")
+                            .smallIcon(R.drawable.pugnotification_ic_launcher)
+                            .largeIcon(R.drawable.pugnotification_ic_launcher)
+                            .flags(Notification.DEFAULT_ALL)
+                            .simple()
+                            .build();
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Toast.makeText(getApplicationContext(), "Register Failed Json", Toast.LENGTH_LONG).show();
@@ -155,16 +183,17 @@ public class MainActivity extends Activity implements HomeFragment.OnFragmentInt
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.d(TAG_NAME, error.getMessage());
+                Log.d(TAG_NAME, "Error " + error);
                 Toast.makeText(getApplicationContext(), "Register Failed1", Toast.LENGTH_LONG).show();
             }
-        }){
+        })
+        {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> map = new HashMap<>();
                 map.put("Authorization", getToken());
                 map.put("Content-Type", "application/json");
-                return super.getHeaders();
+                return map;
             }
         };
         requestQueue.add(jsonObjectRequest);
@@ -180,8 +209,17 @@ public class MainActivity extends Activity implements HomeFragment.OnFragmentInt
 
     public static void addMessage(String data) {
         Log.d("TAGGGGGGG", data);
-
 //        mMessageAdapter.addMessage(new Message(data));
+//        String[] items = data.split(",");
+//        WearableHRV hrv = new WearableHRV(items[0], Integer.valueOf(items[1]), Float.parseFloat(items[2]));
+//       //Date:2019-6-4 1:30:5,rrInterval:0,HR: -3
+//        list.add(hrv);
+//        if (list.size() == 10){
+//            predictDataByApi(list);
+//        }
+
+
+
     }
 
 
@@ -205,6 +243,7 @@ public class MainActivity extends Activity implements HomeFragment.OnFragmentInt
         if (mIsBound) {
             unbindService(mConnection);
         }
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
         super.onDestroy();
     }
 
@@ -245,6 +284,8 @@ public class MainActivity extends Activity implements HomeFragment.OnFragmentInt
             mConsumerService = ((ConsumerService.LocalBinder) service).getService();
             updateTextView("onServiceConnected");
             Log.d("TAGGGGGGG", "updateText");
+            connectDevice();
+
 
         }
 
@@ -257,6 +298,20 @@ public class MainActivity extends Activity implements HomeFragment.OnFragmentInt
             updateTextView("onServiceDisconnected");
         }
     };
+
+    private void connectDevice() {
+        if (mIsBound == true && mConsumerService != null) {
+            mConsumerService.findPeers();
+            Log.d(TAG_NAME, "Finding Peers");
+            if (mConsumerService.sendData("Hello1 Accessory!")) {
+                addMessage("Sent:Hello1 Accessory!");
+                Toast.makeText(getApplicationContext(), "Connected", Toast.LENGTH_LONG).show();
+
+            } else {
+                Toast.makeText(getApplicationContext(), "Disconnected", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
 
     public static void updateTextView(final String str) {
 //        mTextView.setText(str);

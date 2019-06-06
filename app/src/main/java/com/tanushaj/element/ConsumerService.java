@@ -32,6 +32,7 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -192,7 +193,8 @@ public class ConsumerService extends SAAgent {
         @Override
         public void onReceive(int channelId, byte[] data) {
             final String message = new String(data);
-            addMessage("Received: ", message);
+//            addMessage("Received: ", message);
+            sendM(message);
         }
 
         @Override
@@ -200,6 +202,16 @@ public class ConsumerService extends SAAgent {
             updateTextView("Disconnected");
             closeConnection();
         }
+
+
+    }
+
+    private void sendM(String message) {
+        Log.d("sender", "Broadcasting message");
+        Intent intent = new Intent("custom-event-name");
+        // You can also include some extra data.
+        intent.putExtra("message", message);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     public class LocalBinder extends Binder {
@@ -276,4 +288,7 @@ public class ConsumerService extends SAAgent {
             }
         });
     }
+
+//    private (context)
+
 }

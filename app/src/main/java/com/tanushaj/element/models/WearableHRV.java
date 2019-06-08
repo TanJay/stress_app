@@ -1,4 +1,4 @@
-package com.tanushaj.element;
+package com.tanushaj.element.models;
 
 public class WearableHRV {
     private String dateTime;

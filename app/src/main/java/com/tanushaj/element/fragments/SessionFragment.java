@@ -1,9 +1,11 @@
-package com.tanushaj.element;
+package com.tanushaj.element.fragments;
 
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +19,8 @@ import com.anychart.core.stock.Plot;
 import com.anychart.data.Table;
 import com.anychart.data.TableMapping;
 import com.anychart.enums.StockSeriesType;
+import com.tanushaj.element.R;
+import com.tanushaj.element.SessionViewAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +34,7 @@ import java.util.List;
  * Use the {@link SessionFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SessionFragment extends Fragment {
+public class SessionFragment extends Fragment{
     AnyChartView anyChartView;
 
     private OnFragmentInteractionListener mListener;
@@ -63,6 +67,16 @@ public class SessionFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_session, container, false);
+
+
+
+
+
+
+
+
+
+
         anyChartView = view.findViewById(R.id.histogramChart);
         anyChartView.setProgressBar(view.findViewById(R.id.progress_bar));
         Table table = Table.instantiate("x");
@@ -114,6 +128,7 @@ public class SessionFragment extends Fragment {
         super.onDetach();
         mListener = null;
     }
+
 
     /**
      * This interface must be implemented by activities that contain this

@@ -1,6 +1,5 @@
 package com.tanushaj.element;
 
-import android.app.Activity;
 import android.app.Notification;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -9,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -19,12 +19,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -34,7 +29,11 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.samsung.android.sdk.accessory.SAAgentV2;
+import com.tanushaj.element.fragments.HomeFragment;
+import com.tanushaj.element.fragments.ProfileFragment;
+import com.tanushaj.element.fragments.SessionFragment;
+import com.tanushaj.element.models.WearableHRV;
+import com.tanushaj.element.services.ConsumerService;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,7 +41,6 @@ import org.json.JSONObject;
 import org.tensorflow.lite.Interpreter;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,6 +62,27 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        PugNotification.with(getApplicationContext())
+                .load()
+                .title("asd")
+                .message("asdas")
+                .bigTextStyle("asdas")
+                .smallIcon(R.drawable.pugnotification_ic_launcher)
+                .largeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.pugnotification_ic_launcher))
+                .simple()
+                .build();
+
+//        PugNotification.with(MainActivity.this)
+//                .load()
+//                .title("Element")
+//                .message("Google")
+//                .bigTextStyle("Stress Level")
+//                .smallIcon(R.drawable.pugnotification_ic_launcher)
+//                .largeIcon(R.drawable.pugnotification_ic_launcher)
+//                .flags(Notification.DEFAULT_ALL)
+//                .simple()
+//                .build();
+
         BottomNavigationView bottomNavigationView = findViewById(R.id.navigationView);
 
         bottomNavigationView.setOnNavigationItemSelectedListener
@@ -73,10 +92,10 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
                         Fragment selectedFragment = null;
                         switch (item.getItemId()) {
                             case R.id.navigation_songs:
-                                selectedFragment = HomeFragment.newInstance("hh", "hh");
+                                selectedFragment = SessionFragment.newInstance();
                                 break;
                             case R.id.navigation_artists:
-                                selectedFragment = SessionFragment.newInstance();
+                                selectedFragment = HomeFragment.newInstance("hh", "hh");
                                 break;
                             case R.id.navigation_albums:
                                 selectedFragment = ProfileFragment.newInstance("pp", "pp");
@@ -90,9 +109,9 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
                 });
 
         //Manually displaying the first fragment - one time only
-//        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-//        transaction.replace(R.id.container, HomeFragment.newInstance("hh", "hh"));
-//        transaction.commit();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.container, HomeFragment.newInstance("hh", "hh"));
+        transaction.commit();
 
         //Used to select an item programmatically
         bottomNavigationView.getMenu().getItem(2).setChecked(true);

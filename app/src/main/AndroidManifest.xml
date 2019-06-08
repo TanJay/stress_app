@@ -37,7 +37,7 @@
 
         </activity>
 
-        <service android:name="com.tanushaj.element.ConsumerService" />
+        <service android:name="com.tanushaj.element.services.ConsumerService" />
 
         <receiver android:name="com.samsung.android.sdk.accessory.RegisterUponInstallReceiver" >
             <intent-filter>

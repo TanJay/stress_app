@@ -21,7 +21,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.tanushaj.element;
+package com.tanushaj.element.services;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -39,9 +39,9 @@ import android.widget.Toast;
 import com.samsung.android.sdk.SsdkUnsupportedException;
 import com.samsung.android.sdk.accessory.SA;
 import com.samsung.android.sdk.accessory.SAAgent;
-import com.samsung.android.sdk.accessory.SAAgentV2;
 import com.samsung.android.sdk.accessory.SAPeerAgent;
 import com.samsung.android.sdk.accessory.SASocket;
+import com.tanushaj.element.MainActivity;
 
 import java.io.IOException;
 

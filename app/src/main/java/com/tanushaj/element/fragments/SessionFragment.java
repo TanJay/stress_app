@@ -1,14 +1,17 @@
 package com.tanushaj.element.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.anychart.AnyChart;
 import com.anychart.AnyChartView;
@@ -19,6 +22,8 @@ import com.anychart.core.stock.Plot;
 import com.anychart.data.Table;
 import com.anychart.data.TableMapping;
 import com.anychart.enums.StockSeriesType;
+import com.tanushaj.element.LevelActivity;
+import com.tanushaj.element.LiveFeed;
 import com.tanushaj.element.R;
 import com.tanushaj.element.SessionViewAdapter;
 
@@ -34,8 +39,10 @@ import java.util.List;
  * Use the {@link SessionFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SessionFragment extends Fragment{
+public class SessionFragment extends Fragment implements View.OnClickListener {
     AnyChartView anyChartView;
+    Button liveFeedButton;
+    Button startSession;
 
     private OnFragmentInteractionListener mListener;
 
@@ -69,6 +76,12 @@ public class SessionFragment extends Fragment{
         View view = inflater.inflate(R.layout.fragment_session, container, false);
 
 
+        startSession = view.findViewById(R.id.BeginBtn1);
+        startSession.setOnClickListener(this);
+
+        liveFeedButton = view.findViewById(R.id.LiveViewBtn);
+        liveFeedButton.setOnClickListener(this);
+//        Fragment
 
 
 
@@ -127,6 +140,17 @@ public class SessionFragment extends Fragment{
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.BeginBtn1:
+                startActivity(new Intent(getContext(), LevelActivity.class));
+                break;
+            case R.id.LiveViewBtn:
+                break;
+        }
     }
 
 

@@ -1,55 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".LevelActivity">
 
+    <Button
+        android:id="@+id/cancel_session"
+        android:layout_margin="20dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/cancel"/>
+
     <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/download">
+        android:background="@drawable/session_player_background">
 
-        <TextView
+        <LinearLayout
+            android:padding="30dp"
+            android:layout_gravity="center_horizontal"
+            android:orientation="vertical"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/basicLevelNoTxt"
-            android:text="Basics 02"/>
+            android:layout_height="wrap_content">
+            <TextView
+                android:padding="20dp"
+                android:textSize="40sp"
+                android:textColor="@color/white"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/basicLevelNoTxt"
+                android:text="Basics 02"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/sessionNoTxt"
-            android:text="Session 01" />
+            <TextView
+                android:layout_gravity="center_horizontal"
+                android:padding="20dp"
+                android:textSize="30sp"
+                android:textColor="@color/white"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/sessionNoTxt"
+                android:text="Session 01" />
+        </LinearLayout>
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/playOrPauseBtn"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/playDurationTxt"
-            android:text="00.00"/>
+            <LinearLayout
+                android:orientation="vertical"
+                android:padding="30dp"
+                android:layout_alignParentBottom="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/tottalDurationTimeTxt"
-            android:text="5 Mins"/>
+                <Button
+                    android:layout_gravity="center"
+                    android:background="@drawable/play_button"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:id="@+id/playOrPauseBtn"/>
+                <com.arges.sepan.argmusicplayer.PlayerViews.ArgPlayerSmallView
+                    android:id="@+id/argmusicplayer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
 
-        <Spinner
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:spinnerMode="dropdown"
-            android:entries="@array/PlayTimeDurationArray"
-            android:id="@+id/selectTimeDurationDropdown"
-            android:visibility="invisible">
 
-        </Spinner>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/playDurationTxt"
+                android:text="00.00"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/tottalDurationTimeTxt"
+                android:text="5 Mins"/>
+
+            <Spinner
+                android:background="@color/white"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:spinnerMode="dropdown"
+                android:entries="@array/PlayTimeDurationArray"
+                android:id="@+id/selectTimeDurationDropdown"
+                android:visibility="invisible">
+
+            </Spinner>
+
+        </RelativeLayout>
+
 
     </LinearLayout>
 
-</android.support.constraint.ConstraintLayout>
+</RelativeLayout>

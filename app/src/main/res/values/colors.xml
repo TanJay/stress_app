@@ -5,5 +5,7 @@
     <color name="colorPrimaryLiter">#61DB3B</color>
     <color name="colorPrimaryDark">#1A6C00</color>
     <color name="colorAccent">#2BB100</color>
+    <color name="stressHigh">#8B0000</color>
+    <color name="stressNormal">#006400</color>
     <color name="white">#ffffff</color>
 </resources>

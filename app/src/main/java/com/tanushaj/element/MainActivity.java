@@ -1,5 +1,6 @@
 package com.tanushaj.element;
 
+import android.app.Activity;
 import android.app.Notification;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -32,6 +33,7 @@ import com.android.volley.toolbox.Volley;
 import com.tanushaj.element.fragments.HomeFragment;
 import com.tanushaj.element.fragments.ProfileFragment;
 import com.tanushaj.element.fragments.SessionFragment;
+import com.tanushaj.element.models.QuoteDto;
 import com.tanushaj.element.models.WearableHRV;
 import com.tanushaj.element.services.ConsumerService;
 
@@ -53,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
     public String PREFERENCE_NAME = "element";
  List<WearableHRV> list = new ArrayList<>();
     Interpreter tflite;
+        QuoteAlert alert;
 
     private boolean mIsBound = false;
     private ConsumerService mConsumerService = null;
@@ -125,6 +128,43 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
                 new IntentFilter("custom-event-name"));
 
 
+        alert = new QuoteAlert();
+        getQuote(this);
+
+    }
+
+    private void getQuote(final Activity activity){
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        final String url = "https://favqs.com/api/qotd";
+
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.d(TAG_NAME, "Response");
+                try {
+                    JSONObject jsonObject = response.getJSONObject("quote");
+                    String body = jsonObject.getString("body");
+                    String author = jsonObject.getString("author");
+                    alert.showDialog(activity, new QuoteDto(author, body));
+//                    textView.setText(String.format("%s - %s -", body, author));
+//                    switchScreen();
+//                    startActivity(new Intent(getApplicationContext(), LogInActivity.class));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Toast.makeText(getApplicationContext(), "Register Failed Json" , Toast.LENGTH_LONG).show();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d(TAG_NAME, error.getMessage());
+                Toast.makeText(getApplicationContext(), "Register Failed1", Toast.LENGTH_LONG).show();
+            }
+        });
+        requestQueue.add(jsonObjectRequest);
     }
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
@@ -266,37 +306,6 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
         super.onDestroy();
     }
 
-//    public void mOnClick(View v) {
-//        switch (v.getId()) {
-//            case R.id.buttonConnect: {
-//                if (mIsBound == true && mConsumerService != null) {
-//                    mConsumerService.findPeers();
-//                }
-//                break;
-//            }
-//            case R.id.buttonDisconnect: {
-//                if (mIsBound == true && mConsumerService != null) {
-//                    if (mConsumerService.closeConnection() == false) {
-//                        updateTextView("Disconnected");
-//                        Toast.makeText(getApplicationContext(), R.string.ConnectionAlreadyDisconnected, Toast.LENGTH_LONG).show();
-//                        mMessageAdapter.clear();
-//                    }
-//                }
-//                break;
-//            }
-//            case R.id.buttonSend: {
-//                if (mIsBound == true && mConsumerService != null) {
-//                    if (mConsumerService.sendData("Hello Accessory!")) {
-//                    } else {
-//                        Toast.makeText(getApplicationContext(), R.string.ConnectionAlreadyDisconnected, Toast.LENGTH_LONG).show();
-//                    }
-//                }
-//                break;
-//            }
-//            default:
-//        }
-//    }
-
     private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
@@ -338,68 +347,6 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
 
     }
 
-//    private class MessageAdapter extends BaseAdapter {
-//        private static final int MAX_MESSAGES_TO_DISPLAY = 20;
-//        private List<Message> mMessages;
-//
-//        public MessageAdapter() {
-//            mMessages = Collections.synchronizedList(new ArrayList<Message>());
-//        }
-//
-//        void addMessage(final Message msg) {
-//            runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    if (mMessages.size() == MAX_MESSAGES_TO_DISPLAY) {
-//                        mMessages.remove(0);
-//                        mMessages.add(msg);
-//                    } else {
-//                        mMessages.add(msg);
-//                    }
-//                    notifyDataSetChanged();
-////                    mMessageListView.setSelection(getCount() - 1);
-//                }
-//            });
-//        }
-//
-//        void clear() {
-//            runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    mMessages.clear();
-//                    notifyDataSetChanged();
-//                }
-//            });
-//        }
-//
-//        @Override
-//        public int getCount() {
-//            return mMessages.size();
-//        }
-//
-//        @Override
-//        public Object getItem(int position) {
-//            return mMessages.get(position);
-//        }
-//
-//        @Override
-//        public long getItemId(int position) {
-//            return 0;
-//        }
-//
-//        @Override
-//        public View getView(int position, View convertView, ViewGroup parent) {
-//            LayoutInflater inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//            View messageRecordView = null;
-//            if (inflator != null) {
-////                messageRecordView = inflator.inflate(R.layout.message, null);
-////                TextView tvData = (TextView) messageRecordView.findViewById(R.id.tvData);
-//                Message message = (Message) getItem(position);
-////                tvData.setText(message.data);
-//            }
-//            return messageRecordView;
-//        }
-//    }
 
     private static final class Message {
         String data;

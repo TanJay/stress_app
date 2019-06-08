@@ -6,6 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -34,9 +36,15 @@ public class LogInActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getSupportActionBar().hide();
         setContentView(R.layout.activity_log_in);
+//        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+//        //Remove notification bar
+//        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//        this.setContentView(R.layout.activity_log_in);
 
-        if(checkLoggedIn()) startActivity(new Intent(this, DailyQuoteActivity.class));
+        if(checkLoggedIn()) startActivity(new Intent(this, MainActivity.class));
 
 
         email = findViewById(R.id.signUpUserName);

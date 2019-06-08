@@ -6,16 +6,22 @@
     android:layout_height="match_parent"
     tools:context=".fragments.SessionFragment">
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:background="@drawable/download"
+            android:background="@drawable/session_background"
             android:orientation="vertical"
             android:paddingLeft="50dp">
 
@@ -46,6 +52,8 @@
                 android:text="Begin" />
         </LinearLayout>
 
+
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -58,6 +66,7 @@
                 android:layout_weight="1">
 
                 <LinearLayout
+                    android:background="@color/colorPrimaryDark"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="horizontal"
@@ -65,13 +74,14 @@
                     android:paddingRight="20dp">
 
                     <TextView
+                        android:layout_gravity="center_vertical"
                         android:id="@+id/listeningTimetxt"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Start Listening \nfor 10 minutes"
+                        android:text="Start Listening for 10 minutes"
                         android:lineSpacingExtra="5pt"
-                        android:textColor="#ff7f4f" />
+                        android:textColor="@color/white" />
 
                     <Button
                         android:id="@+id/BeginBtn1"
@@ -79,6 +89,40 @@
                         android:layout_height="30dp"
                         android:background="@drawable/round_button_orange_background"
                         android:text="Begin"
+                        android:textColor="@color/white"
+                        android:layout_gravity="center_vertical"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+
+                <LinearLayout
+                    android:background="@color/colorPrimary"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="20dp">
+
+                    <TextView
+                        android:layout_gravity="center_vertical"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Stress Processing Live View"
+                        android:lineSpacingExtra="5pt"
+                        android:textColor="@color/white" />
+
+                    <Button
+                        android:id="@+id/LiveViewBtn"
+                        android:layout_width="80dp"
+                        android:layout_height="30dp"
+                        android:background="@drawable/round_button_liveview_background"
+                        android:text="Show"
                         android:textColor="@color/white"
                         android:layout_gravity="center_vertical"/>
                 </LinearLayout>
@@ -113,7 +157,7 @@
 
             </LinearLayout>
         </LinearLayout>
-
     </LinearLayout>
+    </ScrollView>
 
 </FrameLayout>

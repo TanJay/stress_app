@@ -6,38 +6,111 @@
     android:layout_height="match_parent"
     tools:context=".LogInActivity">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+    <Button
+        android:id="@+id/loginButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Login"
+        tools:layout_editor_absoluteX="161dp"
+        tools:layout_editor_absoluteY="502dp" />
+
+    <TextView
+        android:id="@+id/linkToRegister"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Not A Memeber.. SIgn UP"
+        app:layout_constraintBottom_toTopOf="@+id/guideline5"
+        tools:layout_editor_absoluteX="125dp" />
+
+    <EditText
+        android:id="@+id/signUpUserName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:background="@android:color/transparent"
+        android:drawableLeft="@drawable/close-envelope"
+        android:drawablePadding="12dp"
+        android:hint="Email Address"
+        android:inputType="textEmailAddress"
+        android:maxLines="1"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toTopOf="@+id/guideline6"
+        app:layout_constraintEnd_toStartOf="@+id/guideline3"
+        app:layout_constraintStart_toStartOf="@+id/guideline2"
+        app:layout_constraintTop_toTopOf="@+id/guideline4" />
+
+    <EditText
+        android:id="@+id/signUpPassword"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="8dp"
+        android:hint="Password"
+        android:inputType="textPassword"
+        android:maxLines="1"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toTopOf="@+id/loginButton"
+        app:layout_constraintEnd_toStartOf="@+id/guideline3"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/guideline2"
+        app:layout_constraintTop_toTopOf="@+id/guideline6" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="344dp"
+        android:layout_height="130dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline4"
+        app:layout_constraintEnd_toStartOf="@+id/guideline3"
+        app:layout_constraintStart_toStartOf="@+id/guideline2"
+        app:layout_constraintTop_toTopOf="@+id/guideline"
+        tools:srcCompat="@drawable/logo_transparent" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.05" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:gravity="center">
+        app:layout_constraintGuide_percent="0.06326034" />
 
-        <EditText
-            android:id="@+id/signUpUserName"
-            android:layout_width="wrap_content"
-            android:layout_height="34dp"
-            android:hint="User Name"
-            android:inputType="" />
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.95620435" />
 
-        <EditText
-            android:id="@+id/signUpPassword"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:hint="Password"
-            android:inputType="textPassword" />
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.35" />
 
-        <Button
-            android:id="@+id/loginButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Login" />
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.9" />
 
-        <TextView
-            android:id="@+id/linkToRegister"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Not A Memeber.. SIgn UP" />
-
-    </LinearLayout>
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="402dp" />
 
 </android.support.constraint.ConstraintLayout>

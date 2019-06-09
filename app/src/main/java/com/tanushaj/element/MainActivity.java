@@ -2,6 +2,10 @@ package com.tanushaj.element;
 
 import android.app.Activity;
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -10,6 +14,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -17,6 +22,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -59,21 +65,32 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
 
     private boolean mIsBound = false;
     private ConsumerService mConsumerService = null;
+    NotificationManager notificationManager;
+    int NOTIFICATION_ID = 234;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        PugNotification.with(getApplicationContext())
-                .load()
-                .title("asd")
-                .message("asdas")
-                .bigTextStyle("asdas")
-                .smallIcon(R.drawable.pugnotification_ic_launcher)
-                .largeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.pugnotification_ic_launcher))
-                .simple()
-                .build();
+        notificationManager = (NotificationManager) MainActivity.this.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+
+
+            String CHANNEL_ID = "my_channel_01";
+            CharSequence name = "my_channel";
+            String Description = "This is my channel";
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel mChannel = new NotificationChannel(CHANNEL_ID, name, importance);
+            mChannel.setDescription(Description);
+            mChannel.enableLights(true);
+            mChannel.setLightColor(Color.RED);
+            mChannel.enableVibration(true);
+            mChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
+            mChannel.setShowBadge(false);
+            notificationManager.createNotificationChannel(mChannel);
+        }
 
 //        PugNotification.with(MainActivity.this)
 //                .load()
@@ -223,16 +240,17 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
                     String message = response.getString("message");
                     Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
 //                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                    PugNotification.with(MainActivity.this)
-                            .load()
-                            .title("Element")
-                            .message(message)
-                            .bigTextStyle("Stress Level")
-                            .smallIcon(R.drawable.pugnotification_ic_launcher)
-                            .largeIcon(R.drawable.pugnotification_ic_launcher)
-                            .flags(Notification.DEFAULT_ALL)
-                            .simple()
-                            .build();
+                    showNotification("Element", "Stress");
+//                    PugNotification.with(MainActivity.this)
+//                            .load()
+//                            .title("Element")
+//                            .message(message)
+//                            .bigTextStyle("Stress Level")
+//                            .smallIcon(R.drawable.pugnotification_ic_launcher)
+//                            .largeIcon(R.drawable.pugnotification_ic_launcher)
+//                            .flags(Notification.DEFAULT_ALL)
+//                            .simple()
+//                            .build();
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Toast.makeText(getApplicationContext(), "Register Failed Json", Toast.LENGTH_LONG).show();
@@ -256,6 +274,22 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
             }
         };
         requestQueue.add(jsonObjectRequest);
+
+    }
+
+    private void showNotification(String title, String message){
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(MainActivity.this, "my_channel_01")
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle(title)
+                .setContentText(message);
+
+        Intent resultIntent = new Intent(MainActivity.this, MainActivity.class);
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(MainActivity.this);
+        stackBuilder.addParentStack(MainActivity.class);
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(resultPendingIntent);
+        notificationManager.notify(NOTIFICATION_ID, builder.build());
 
     }
 

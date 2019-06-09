@@ -19,6 +19,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.tanushaj.element.fragments.HomeFragment;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -44,7 +45,7 @@ public class LogInActivity extends AppCompatActivity {
 //        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 //        this.setContentView(R.layout.activity_log_in);
 
-        if(checkLoggedIn()) startActivity(new Intent(this, MainActivity.class));
+        if(checkLoggedIn()) NavigateToMain();
 
 
         email = findViewById(R.id.signUpUserName);
@@ -64,6 +65,13 @@ public class LogInActivity extends AppCompatActivity {
                 startActivity(new Intent(getApplicationContext(), SignUpActivity.class));
             }
         });
+    }
+
+    private void NavigateToMain(){
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
     }
 
     private Boolean checkLoggedIn(){
@@ -102,7 +110,7 @@ public class LogInActivity extends AppCompatActivity {
                     String token = response.getString("token");
                     savePreferences(token);
                     Toast.makeText(getApplicationContext(), "Login Success", Toast.LENGTH_LONG).show();
-                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                    NavigateToMain();
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Toast.makeText(getApplicationContext(), "Login Failed Json" , Toast.LENGTH_LONG).show();

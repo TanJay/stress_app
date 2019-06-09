@@ -51,6 +51,24 @@
             android:layout_height="match_parent">
 
             <LinearLayout
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:textSize="20sp"
+                    android:textColor="@color/white"
+                    android:layout_weight="1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/playDurationTxt"
+                    android:text="00.00"/>
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:orientation="vertical"
                 android:padding="30dp"
                 android:layout_alignParentBottom="true"
@@ -63,24 +81,28 @@
                     android:layout_width="100dp"
                     android:layout_height="100dp"
                     android:id="@+id/playOrPauseBtn"/>
-                <com.arges.sepan.argmusicplayer.PlayerViews.ArgPlayerSmallView
-                    android:id="@+id/argmusicplayer"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                <LinearLayout
+                    android:padding="5dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_weight="2"
+                    android:orientation="horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+
+                    <TextView
+                        android:textSize="14sp"
+                        android:textColor="@color/white"
+                        android:layout_weight="1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/totalDurationTimeTxt"
+                        android:text="5 Mins"/>
+                </LinearLayout>
             </LinearLayout>
 
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/playDurationTxt"
-                android:text="00.00"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/tottalDurationTimeTxt"
-                android:text="5 Mins"/>
 
             <Spinner
                 android:background="@color/white"

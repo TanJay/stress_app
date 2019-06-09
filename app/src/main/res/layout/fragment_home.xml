@@ -172,22 +172,24 @@
             android:layout_height="wrap_content">
 
             <Button
-                android:layout_marginRight="10dp"
-                android:layout_marginLeft="10dp"
-                android:text="Logout"
-                android:background="@drawable/profile_button"
-                android:layout_weight="1"
+                android:id="@+id/userLogout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/profile_button"
+                android:text="Logout" />
 
             <Button
-                android:layout_marginRight="10dp"
-                android:layout_marginLeft="10dp"
-                android:text="Reset"
-                android:background="@drawable/profile_button"
-                android:layout_weight="1"
+                android:id="@+id/userReset"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/profile_button"
+                android:text="Reset" />
 
         </LinearLayout>
 

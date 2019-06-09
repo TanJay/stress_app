@@ -138,10 +138,24 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
                 new IntentFilter("custom-event-name"));
 
 
+        LocalBroadcastManager.getInstance(this).registerReceiver(disconnectReceiver,
+                new IntentFilter("disconnect_event"));
+
         alert = new QuoteAlert();
         getQuote(this);
 
     }
+
+
+    private BroadcastReceiver disconnectReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Get extra data included in the Intent
+            int message = intent.getIntExtra("message", -1);
+            if(message == 1) mConsumerService.sendData("stopservice");
+            if(message == 2) mConsumerService.sendData("startservice");
+        }
+    };
 
 
     private void getQuote(final Activity activity){

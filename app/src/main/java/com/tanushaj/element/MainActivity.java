@@ -16,6 +16,7 @@ import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
@@ -66,7 +67,11 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
     private boolean mIsBound = false;
     private ConsumerService mConsumerService = null;
     NotificationManager notificationManager;
+    NotificationChannel mChannel;
     int NOTIFICATION_ID = 234;
+    String CHANNEL_ID = "my_channel_01";
+    CharSequence name = "my_channel";
+    String Description = "This is my channel";
 
 
     @Override
@@ -75,33 +80,21 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
         setContentView(R.layout.activity_main);
 
         notificationManager = (NotificationManager) MainActivity.this.getSystemService(Context.NOTIFICATION_SERVICE);
+
+
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-
-
-            String CHANNEL_ID = "my_channel_01";
-            CharSequence name = "my_channel";
-            String Description = "This is my channel";
             int importance = NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel mChannel = new NotificationChannel(CHANNEL_ID, name, importance);
+            mChannel = new NotificationChannel(CHANNEL_ID, name, importance);
             mChannel.setDescription(Description);
             mChannel.enableLights(true);
             mChannel.setLightColor(Color.RED);
             mChannel.enableVibration(true);
             mChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
             mChannel.setShowBadge(false);
-            notificationManager.createNotificationChannel(mChannel);
+//            notificationManager.createNotificationChannel(mChannel);
+
         }
 
-//        PugNotification.with(MainActivity.this)
-//                .load()
-//                .title("Element")
-//                .message("Google")
-//                .bigTextStyle("Stress Level")
-//                .smallIcon(R.drawable.pugnotification_ic_launcher)
-//                .largeIcon(R.drawable.pugnotification_ic_launcher)
-//                .flags(Notification.DEFAULT_ALL)
-//                .simple()
-//                .build();
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.navigationView);
 
@@ -150,6 +143,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
 
     }
 
+
     private void getQuote(final Activity activity){
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         final String url = "https://favqs.com/api/qotd";
@@ -194,7 +188,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
             WearableHRV hrv = new WearableHRV(items[0], Integer.valueOf(items[1]), Float.parseFloat(items[2]));
             //Date:2019-6-4 1:30:5,rrInterval:0,HR: -3
             list.add(hrv);
-            if (list.size() == 50){
+            if (list.size() == 150){
                 predictDataByApi(list);
                 list.clear();
             }
@@ -235,22 +229,22 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
 
             @Override
             public void onResponse(JSONObject response) {
-//                Log.d(TAG_NAME, "Response");
+                Log.d(TAG_NAME, "Response");
                 try {
-                    String message = response.getString("message");
-                    Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
-//                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                    showNotification("Element", "Stress");
-//                    PugNotification.with(MainActivity.this)
-//                            .load()
-//                            .title("Element")
-//                            .message(message)
-//                            .bigTextStyle("Stress Level")
-//                            .smallIcon(R.drawable.pugnotification_ic_launcher)
-//                            .largeIcon(R.drawable.pugnotification_ic_launcher)
-//                            .flags(Notification.DEFAULT_ALL)
-//                            .simple()
-//                            .build();
+                    int message = response.getInt("stress_prediction");
+                    Intent intent = new Intent("stress_detection_event");
+                    intent.putExtra("message", message);
+                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+                    if(message > 0){
+                        Toast.makeText(getApplicationContext(), "Stress", Toast.LENGTH_LONG).show();
+
+
+
+                        showNotification("Element", "Your are now stressed please listen to some beats");
+                    }else{
+                        Toast.makeText(getApplicationContext(), "No Stress", Toast.LENGTH_LONG).show();
+                    }
+                    Log.d(TAG_NAME, "Response");
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Toast.makeText(getApplicationContext(), "Register Failed Json", Toast.LENGTH_LONG).show();
@@ -278,17 +272,24 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
     }
 
     private void showNotification(String title, String message){
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(MainActivity.this, "my_channel_01")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            notificationManager.createNotificationChannel(mChannel);
+        }
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(MainActivity.this, CHANNEL_ID)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle(title)
+//                        .setPriority(NotificationManager.IMPORTANCE_HIGH)
                 .setContentText(message);
 
         Intent resultIntent = new Intent(MainActivity.this, MainActivity.class);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(MainActivity.this);
-        stackBuilder.addParentStack(MainActivity.class);
         stackBuilder.addNextIntent(resultIntent);
+        stackBuilder.addParentStack(MainActivity.class);
         PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+
         builder.setContentIntent(resultPendingIntent);
+
         notificationManager.notify(NOTIFICATION_ID, builder.build());
 
     }
@@ -325,6 +326,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
     // SAAgent
     @Override
     protected void onDestroy() {
+        mConsumerService.sendData("stopservice");
         // Clean up connections
         if (mIsBound == true && mConsumerService != null) {
             if (mConsumerService.closeConnection() == false) {
@@ -365,7 +367,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
         if (mIsBound == true && mConsumerService != null) {
             mConsumerService.findPeers();
             Log.d(TAG_NAME, "Finding Peers");
-            if (mConsumerService.sendData("Hello1 Accessory!")) {
+            if (mConsumerService.sendData("Hello Accessory!")) {
                 addMessage("Sent:Hello1 Accessory!");
                 Toast.makeText(getApplicationContext(), "Connected", Toast.LENGTH_LONG).show();
 

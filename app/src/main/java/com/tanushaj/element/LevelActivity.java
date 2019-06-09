@@ -1,6 +1,5 @@
 package com.tanushaj.element;
 
-import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -9,10 +8,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
-import com.arges.sepan.argmusicplayer.Enums.AudioType;
-import com.arges.sepan.argmusicplayer.IndependentClasses.ArgAudio;
-import com.arges.sepan.argmusicplayer.PlayerViews.ArgPlayerSmallView;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -29,6 +24,7 @@ public class LevelActivity extends AppCompatActivity implements View.OnClickList
     private int playBackPosition = 0;
     TextView playDurationTxt;
     TextView totalDurationTimeTxt;
+        FiveStarsDialog fiveStarsDialog;
 //    Handler handler;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +32,11 @@ public class LevelActivity extends AppCompatActivity implements View.OnClickList
         getSupportActionBar().hide();
         setContentView(R.layout.activity_level);
         mp = new MediaPlayer();
+        fiveStarsDialog = new FiveStarsDialog(this,"tanushajayasinghe@gmail.com");
+        mp.setOnPreparedListener(this);
+        mp.setOnCompletionListener(this);
+        mp.setOnSeekCompleteListener(this);
+
 //        handler = new Handler();
 
         playPauseBtn = findViewById(R.id.playOrPauseBtn);
@@ -60,11 +61,9 @@ public class LevelActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void endSession() {
-        FiveStarsDialog fiveStarsDialog = new FiveStarsDialog(this,"tanushajayasinghe@gmail.com");
-        fiveStarsDialog.setRateText("Your custom text")
-                .setTitle("Your custom title")
+        fiveStarsDialog.setRateText("Help us serve you better in recommending")
+                .setTitle("Please Rate")
                 .setForceMode(false)
-//                .setStarColor(Color.YELLOW)
                 .setUpperBound(2) // Market opened if a rating >= 2 is selected
                 .setNegativeReviewListener(this) // OVERRIDE mail intent for negative review
                 .setReviewListener(this) // Used to listen for reviews (if you want to track them )
@@ -80,20 +79,21 @@ public class LevelActivity extends AppCompatActivity implements View.OnClickList
             if(playBackPosition != 0){
                 mp.seekTo(playBackPosition);
                 mp.start();
+                playPauseBtn.setBackground(getDrawable(R.drawable.pause_button));
             }else {
                 try {
                     mp.setDataSource("https://sample-videos.com/audio/mp3/crowd-cheering.mp3");
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
+                    Log.d("TAGGGGG", e.getLocalizedMessage());
                 }
-                mp.setOnPreparedListener(this);
                 mp.prepareAsync();
+                playPauseBtn.setEnabled(false);
 //                mp.start();
             }
-            playPauseBtn.setBackground(getDrawable(R.drawable.pause_button));
+//            playPauseBtn.setBackground(getDrawable(R.drawable.pause_button));
         }
-        mp.setOnCompletionListener(this);
-        mp.setOnSeekCompleteListener(this);
+
 
     }
 
@@ -101,6 +101,8 @@ public class LevelActivity extends AppCompatActivity implements View.OnClickList
     public void onCompletion(MediaPlayer mp) {
         playBackPosition = 0;
         playPauseBtn.setBackground(getDrawable(R.drawable.play_button));
+        endSession();
+//        mp.release();
     }
 
     @Override
@@ -128,6 +130,8 @@ public class LevelActivity extends AppCompatActivity implements View.OnClickList
     @Override
     public void onPrepared(final MediaPlayer mp) {
         mp.start();
+        playPauseBtn.setEnabled(true);
+        playPauseBtn.setBackground(getDrawable(R.drawable.pause_button));
         totalDurationTimeTxt.setText(String.format("%s Min", String.valueOf(TimeUnit.MILLISECONDS.toMinutes(mp.getDuration()))));
         final Handler handler = new Handler();
         Runnable runnable = new Runnable() {
@@ -153,11 +157,11 @@ public class LevelActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void onNegativeReview(int i) {
-
+        finish();
     }
 
     @Override
     public void onReview(int i) {
-
+        finish();
     }
 }

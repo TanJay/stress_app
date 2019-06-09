@@ -5,9 +5,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,9 +20,9 @@ import com.anychart.data.Table;
 import com.anychart.data.TableMapping;
 import com.anychart.enums.StockSeriesType;
 import com.tanushaj.element.LevelActivity;
-import com.tanushaj.element.LiveFeed;
+import com.tanushaj.element.LiveViewAlert;
 import com.tanushaj.element.R;
-import com.tanushaj.element.SessionViewAdapter;
+import com.tanushaj.element.models.QuoteDto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +40,7 @@ public class SessionFragment extends Fragment implements View.OnClickListener {
     AnyChartView anyChartView;
     Button liveFeedButton;
     Button startSession;
+    ViewGroup viewGroup;
 
     private OnFragmentInteractionListener mListener;
 
@@ -75,11 +73,11 @@ public class SessionFragment extends Fragment implements View.OnClickListener {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_session, container, false);
 
-
+        viewGroup = container;
         startSession = view.findViewById(R.id.BeginBtn1);
         startSession.setOnClickListener(this);
 
-        liveFeedButton = view.findViewById(R.id.LiveViewBtn);
+        liveFeedButton = view.findViewById(R.id.live_view_btn);
         liveFeedButton.setOnClickListener(this);
 //        Fragment
 
@@ -148,7 +146,14 @@ public class SessionFragment extends Fragment implements View.OnClickListener {
             case R.id.BeginBtn1:
                 startActivity(new Intent(getContext(), LevelActivity.class));
                 break;
-            case R.id.LiveViewBtn:
+            case R.id.live_view_btn:
+//                LiveFeed nextFrag= new LiveFeed();
+//                getActivity().getSupportFragmentManager().beginTransaction()
+//                        .replace(R.id.session_fragment, nextFrag, "findThisFragment")
+//                        .addToBackStack(null)
+//                        .commit();
+                LiveViewAlert alert = new LiveViewAlert();
+                alert.showDialog(getActivity());
                 break;
         }
     }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/session_fragment"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -118,7 +119,7 @@
                         android:textColor="@color/white" />
 
                     <Button
-                        android:id="@+id/LiveViewBtn"
+                        android:id="@+id/live_view_btn"
                         android:layout_width="80dp"
                         android:layout_height="30dp"
                         android:background="@drawable/round_button_liveview_background"

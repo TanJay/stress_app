@@ -79,12 +79,10 @@ public class ProfileFragment extends Fragment implements SessionViewAdapter.Item
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
-        List<String> animalNames = new ArrayList<>();
-        animalNames.add("Horse");
-        animalNames.add("Cow");
-        animalNames.add("Camel");
-        animalNames.add("Sheep");
-        animalNames.add("Goat");
+        List<String> beats = new ArrayList<>();
+        beats.add("Study");
+        beats.add("Focus");
+        beats.add("Calm");
 
         // set up the RecyclerView
 //        RecyclerView recyclerView = view.findViewById(R.id.session_recycle);
@@ -95,7 +93,7 @@ public class ProfileFragment extends Fragment implements SessionViewAdapter.Item
 
         RecyclerView recyclerView = view.findViewById(R.id.session_recycle);
         GridLayoutManager linearLayoutManager = new GridLayoutManager(getContext(), 2);
-        adapter = new SessionViewAdapter(getContext(), animalNames);
+        adapter = new SessionViewAdapter(getContext(), beats);
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(adapter);
         recyclerView.setHasFixedSize(true);

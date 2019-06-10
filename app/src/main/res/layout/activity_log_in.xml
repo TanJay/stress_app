@@ -1,89 +1,129 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:paddingTop="30dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/login_background"
+    android:orientation="vertical"
+    android:paddingTop="30dp"
     tools:context=".LogInActivity">
+    <!--android:background="@drawable/login_background"-->
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/profile_image"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:elevation="2dp"
-        android:src="@drawable/logo_transparent" />
-
-    <!--<ImageView-->
-        <!--android:id="@+id/imageView"-->
+    <!--<de.hdodenhof.circleimageview.CircleImageView-->
+        <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
+        <!--android:id="@+id/profile_image"-->
         <!--android:layout_width="match_parent"-->
         <!--android:layout_height="200dp"-->
         <!--android:layout_marginStart="8dp"-->
         <!--android:layout_marginTop="8dp"-->
         <!--android:layout_marginEnd="8dp"-->
         <!--android:layout_marginBottom="8dp"-->
-        <!--app:srcCompat="@drawable/logo_transparent"-->
-        <!--tools:srcCompat="@drawable/logo_transparent" />-->
+        <!--android:elevation="2dp"-->
+        <!--android:src="@drawable/logo_transparent"-->
+        <!--app:civ_border_width="1dp"-->
+        <!--app:civ_border_color="@color/white" />-->
 
-    <LinearLayout
-        android:paddingTop="40dp"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp"
-        android:orientation="vertical"
+    <ImageView
+    android:id="@+id/imageView"
+    android:layout_width="match_parent"
+    android:layout_height="200dp"
+    android:layout_marginStart="8dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginEnd="8dp"
+    android:layout_marginBottom="8dp"
+    app:srcCompat="@drawable/logo_transparent"
+    tools:srcCompat="@drawable/logo_transparent" />
+
+    <android.support.v7.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <EditText
-            android:id="@+id/signUpUserName"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginStart="5dp"
-            android:layout_marginEnd="5dp"
-            android:background="@android:color/transparent"
-            android:drawableLeft="@drawable/close_envelope"
-            android:drawablePadding="20dp"
-            android:textColorHint="@color/white"
-            android:hint="Email Address"
-            android:inputType="textEmailAddress"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:textColor="@color/white" />
-
-        <EditText
-            android:id="@+id/signUpPassword"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginStart="5dp"
-            android:textColorHint="@color/white"
-            android:layout_marginEnd="5dp"
-            android:layout_marginBottom="36dp"
-            android:background="@android:color/transparent"
-            android:drawableLeft="@drawable/password"
-            android:drawablePadding="20dp"
-            android:hint="Password"
-            android:inputType="textPassword"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:textColor="@color/white" />
-
-    </LinearLayout>
-    <RelativeLayout
-        android:paddingTop="15dp"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:elevation="3dp"
+        app:cardBackgroundColor="@color/colorPrimary"
+        app:cardCornerRadius="24dp">
 
         <LinearLayout
-            android:orientation="vertical"
-            android:layout_centerInParent="true"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="20dp"
+            android:paddingTop="20dp"
+            android:paddingRight="20dp">
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/input_layout_email"
+                android:layout_marginBottom="10dp"
+                android:textColorHint="@color/white"
+                android:layout_width="match_parent"
+                android:background="@drawable/login_text_background"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:paddingLeft="10dp"
+                    android:paddingBottom="10dp"
+                    android:id="@+id/signUpUserName"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="5dp"
+                    android:background="@android:color/transparent"
+                    android:drawableLeft="@drawable/envelop"
+                    android:drawablePadding="20dp"
+                    android:hint="Email Address"
+                    android:inputType="textEmailAddress"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:textColor="@color/white"
+                    android:textColorHint="@color/white" />
+
+            </android.support.design.widget.TextInputLayout>
+
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/input_layout_password"
+                android:textColorHint="@color/white"
+                android:background="@drawable/login_text_background"
+                android:layout_width="match_parent"
+                android:layout_marginBottom="36dp"
+
+                android:layout_height="wrap_content">
+
+
+                <EditText
+                    android:paddingLeft="10dp"
+                    android:paddingBottom="10dp"
+                    android:id="@+id/signUpPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="5dp"
+                    android:background="@android:color/transparent"
+                    android:drawableLeft="@drawable/key"
+                    android:drawablePadding="20dp"
+                    android:hint="Password"
+                    android:inputType="textPassword"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:textColor="@color/white"
+                    android:textColorHint="@color/white" />
+
+            </android.support.design.widget.TextInputLayout>
+
+
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="15dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:orientation="vertical">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -91,43 +131,39 @@
 
                 <Button
                     android:id="@+id/loginButton"
-                    android:layout_width="match_parent"
+                    android:layout_width="200dp"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="8dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginBottom="80dp"
-                    android:textColor="@color/white"
-                    android:background="@drawable/round_corner_login_button"
+                    android:background="@drawable/round_button_orange_background"
+                    android:elevation="30dp"
+                    android:text="Login"
 
-                    android:text="Login" />
+                    android:textColor="@color/white" />
             </RelativeLayout>
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
+
                 <TextView
-                    android:layout_centerHorizontal="true"
                     android:id="@+id/linkToRegister"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
                     android:layout_marginStart="8dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginBottom="24dp"
-                    android:textColor="@color/white"
-                    android:text="Don't have an account? Signup" />
+                    android:text="Don't have an account? Signup"
+                    android:textColor="@color/white" />
             </RelativeLayout>
 
 
         </LinearLayout>
     </RelativeLayout>
-
-
-
-
-
-
 
 
 </LinearLayout>

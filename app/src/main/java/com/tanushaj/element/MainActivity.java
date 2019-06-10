@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
         mIsBound = bindService(new Intent(MainActivity.this, ConsumerService.class), mConnection, Context.BIND_AUTO_CREATE);
         Log.d(TAG_NAME, "Find");
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
-                new IntentFilter("custom-event-name"));
+                new IntentFilter("hrm_info_event"));
 
 
         LocalBroadcastManager.getInstance(this).registerReceiver(disconnectReceiver,
@@ -202,7 +202,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
             WearableHRV hrv = new WearableHRV(items[0], Integer.valueOf(items[1]), Float.parseFloat(items[2]));
             //Date:2019-6-4 1:30:5,rrInterval:0,HR: -3
             list.add(hrv);
-            if (list.size() == 150){
+            if (list.size() == 100){
                 predictDataByApi(list);
                 list.clear();
             }
@@ -212,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
 
     public void predictDataByApi(List<WearableHRV> hrvData) {
         RequestQueue requestQueue = Volley.newRequestQueue(this);
-        final String url = "http://51.158.175.210:8081/hrv/";
+        final String url = "http://51.158.175.210:2001/hrv/";
 //                final String url = "http://3491ba42.ngrok.io";
 
 //        Log.d(TAG_NAME, "None");
@@ -378,16 +378,9 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
     };
 
     private void connectDevice() {
-        if (mIsBound == true && mConsumerService != null) {
+        if (mIsBound && mConsumerService != null) {
             mConsumerService.findPeers();
             Log.d(TAG_NAME, "Finding Peers");
-            if (mConsumerService.sendData("Hello Accessory!")) {
-                addMessage("Sent:Hello1 Accessory!");
-                Toast.makeText(getApplicationContext(), "Connected", Toast.LENGTH_LONG).show();
-
-            } else {
-                Toast.makeText(getApplicationContext(), "Disconnected", Toast.LENGTH_LONG).show();
-            }
         }
     }
 

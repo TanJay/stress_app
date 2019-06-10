@@ -61,7 +61,7 @@ public class SignUpActivity extends AppCompatActivity {
     private void signup(){
         registerBtn.setEnabled(false);
         RequestQueue requestQueue = Volley.newRequestQueue(this);
-        final String url = "http://51.158.175.210:8081/user/register";
+        final String url = "http://51.158.175.210:2001/user/register";
         Log.d(TAG_NAME, "None");
 
         JSONObject jsonBody = new JSONObject();

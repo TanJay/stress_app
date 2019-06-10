@@ -90,7 +90,7 @@ public class LogInActivity extends AppCompatActivity {
     private void getToken(){
         loginButton.setEnabled(false);
         RequestQueue requestQueue = Volley.newRequestQueue(this);
-        final String url = "http://51.158.175.210:8081/user/login";
+        final String url = "http://51.158.175.210:2001/user/login";
         Log.d(TAG_NAME, "None");
 
         JSONObject jsonBody = new JSONObject();

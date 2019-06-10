@@ -208,8 +208,7 @@ public class ConsumerService extends SAAgent {
 
     private void sendM(String message) {
         Log.d("sender", "Broadcasting message");
-        Intent intent = new Intent("custom-event-name");
-        // You can also include some extra data.
+        Intent intent = new Intent("hrm_info_event");
         intent.putExtra("message", message);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }

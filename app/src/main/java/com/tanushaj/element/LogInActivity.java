@@ -19,6 +19,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.tanushaj.element.fragments.HomeFragment;
 
 import org.json.JSONArray;
@@ -26,6 +27,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class LogInActivity extends AppCompatActivity {
+
+
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     public String PREFERENCE_NAME = "element";
     public String TAG_NAME = "ELEMENT_TAG";
@@ -47,6 +51,13 @@ public class LogInActivity extends AppCompatActivity {
 
         if(checkLoggedIn()) NavigateToMain();
 
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.ITEM_ID, "1");
+        bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "Element");
+        bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "image");
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
 
         email = findViewById(R.id.signUpUserName);
         password = findViewById(R.id.signUpPassword);

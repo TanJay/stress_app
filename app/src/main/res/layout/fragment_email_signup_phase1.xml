@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".EmailSignupPhase1">
+
+   <RelativeLayout
+       android:layout_marginTop="30dp"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent">
+
+
+
+       <LinearLayout
+           android:layout_marginTop="80dp"
+           android:orientation="vertical"
+           android:layout_width="match_parent"
+           android:layout_height="match_parent">
+
+
+           <android.support.v7.widget.CardView
+               app:cardCornerRadius="10dp"
+               android:layout_margin="30dp"
+               app:cardBackgroundColor="@color/colorPrimary"
+               android:layout_width="match_parent"
+               android:layout_height="300dp">
+
+               <LinearLayout
+                   android:orientation="vertical"
+                   android:layout_width="match_parent"
+                   android:layout_height="match_parent">
+
+                   <android.support.design.widget.TextInputLayout
+                       android:id="@+id/input_layout_password"
+                       android:textColorHint="@color/white"
+                       android:background="@drawable/login_text_background"
+                       android:layout_width="match_parent"
+                       android:layout_marginBottom="36dp"
+                       android:layout_height="wrap_content">
+
+
+                       <EditText
+                           android:paddingLeft="10dp"
+                           android:paddingBottom="10dp"
+                           android:id="@+id/signUpPassword"
+                           android:layout_width="match_parent"
+                           android:layout_height="30dp"
+                           android:layout_marginStart="5dp"
+                           android:layout_marginEnd="5dp"
+                           android:background="@android:color/transparent"
+                           android:drawableLeft="@drawable/key"
+                           android:drawablePadding="20dp"
+                           android:hint="Password"
+                           android:inputType="textPassword"
+                           android:maxLines="1"
+                           android:singleLine="true"
+                           android:textColor="@color/white"
+                           android:textColorHint="@color/white" />
+
+                   </android.support.design.widget.TextInputLayout>
+
+
+               </LinearLayout>
+
+           </android.support.v7.widget.CardView>
+       </LinearLayout>
+
+       <de.hdodenhof.circleimageview.CircleImageView
+           app:civ_border_color="@color/colorPrimary"
+           app:civ_border_width="3dp"
+           android:src="@drawable/student"
+           android:layout_width="wrap_content"
+           android:layout_height="150dp" />
+
+   </RelativeLayout>
+
+</FrameLayout>

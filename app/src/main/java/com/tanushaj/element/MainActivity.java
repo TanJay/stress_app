@@ -37,6 +37,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.chaquo.python.PyObject;
+import com.chaquo.python.Python;
+import com.chaquo.python.android.AndroidPlatform;
 import com.tanushaj.element.fragments.HomeFragment;
 import com.tanushaj.element.fragments.ProfileFragment;
 import com.tanushaj.element.fragments.SessionFragment;
@@ -72,12 +75,30 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
     String CHANNEL_ID = "my_channel_01";
     CharSequence name = "my_channel";
     String Description = "This is my channel";
-
+    List<Float> rRs = new ArrayList<>();
+        Python py;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (! Python.isStarted()) {
+            Python.start(new AndroidPlatform(getApplicationContext()));
+        }
+        py = Python.getInstance();
+        float[] arr = {587,587,587,587,587,587,587,587,587,587,587,587,719,719,719,719,719,719,719,1145,1145,1145,1145,1145,1145,1145,1145,1145,1208,1208,1208,1208,841,841,841,841,841,841,841,841,594,594,634,634,634,634,634,634,634,634};
+        Log.d("Taaaa", py.getModule("main").callAttr("say_my_name", arr).toString());
+        try {
+            JSONArray obj = new JSONArray(py.getModule("main").callAttr("say_my_name", arr).toString());
+            JSONObject feature = obj.getJSONObject(0);
+            JSONObject time = obj.getJSONObject(1);
+            Log.d("Taaaa", String.valueOf(feature.getDouble("mean_nni")));
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
 
         notificationManager = (NotificationManager) MainActivity.this.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -199,12 +220,16 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
             String message = intent.getStringExtra("message");
 //            Log.d("receiver", "Got message: " + message);
             String[] items = message.split(",");
+
             WearableHRV hrv = new WearableHRV(items[0], Integer.valueOf(items[1]), Float.parseFloat(items[2]));
             //Date:2019-6-4 1:30:5,rrInterval:0,HR: -3
             list.add(hrv);
+            rRs.add(Float.valueOf(items[1]));
             if (list.size() == 100){
                 predictDataByApi(list);
+                Log.d("Taaaa", py.getModule("main").callAttr("say_my_name", rRs).toString());
                 list.clear();
+                rRs.clear();
             }
 
         }

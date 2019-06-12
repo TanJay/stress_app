@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.chaquo.python'
 
 android {
     compileSdkVersion 28
@@ -9,6 +11,21 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        python {
+            buildPython "C:/Program Files (x86)/Microsoft Visual Studio/Shared/Anaconda3_64/python.exe"
+            pip {
+                install "numpy"
+                install "pandas"
+                install "scipy"
+                install "scipy"
+            }
+            pyc {
+                stdlib true
+            }
+        }
+        ndk {
+            abiFilters "armeabi-v7a", "x86"
+        }
     }
     buildTypes {
         release {
@@ -45,4 +62,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation files('libs/accessory-v2.6.1.jar')
     implementation files('libs/sdk-v1.0.0.jar')
+    implementation 'com.google.firebase:firebase-core:16.0.0'
+    implementation 'com.google.firebase:firebase-crash:16.0.0'
 }

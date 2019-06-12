@@ -13,6 +13,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
@@ -52,6 +54,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.tensorflow.lite.Interpreter;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -63,9 +69,9 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
     public String TAG = "ELEMENT_TAG";
     public String TAG_NAME = "ELEMENT_TAG";
     public String PREFERENCE_NAME = "element";
- List<WearableHRV> list = new ArrayList<>();
+    List<WearableHRV> list = new ArrayList<>();
     Interpreter tflite;
-        QuoteAlert alert;
+    QuoteAlert alert;
 
     private boolean mIsBound = false;
     private ConsumerService mConsumerService = null;
@@ -76,13 +82,19 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
     CharSequence name = "my_channel";
     String Description = "This is my channel";
     List<Float> rRs = new ArrayList<>();
-        Python py;
+    private static final String MODEL_FILENAME = "file:///assets/element_litev2.tflite";
+    Python py;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        String actualModelFilename = MODEL_FILENAME.split("file:///assets/", -1)[1];
+        try {
+            tflite = new Interpreter(loadModelFile(getAssets(), actualModelFilename));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         if (! Python.isStarted()) {
             Python.start(new AndroidPlatform(getApplicationContext()));
         }
@@ -94,6 +106,24 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
             JSONObject feature = obj.getJSONObject(0);
             JSONObject time = obj.getJSONObject(1);
             Log.d("Taaaa", String.valueOf(feature.getDouble("mean_nni")));
+            float HR = (float) feature.getDouble("mean_hr");
+            float Seconds = 10.0f;
+            float SDNN = (float) feature.getDouble("sdnn");
+            float rmssd = (float) feature.getDouble("rmssd");
+            float pNN50 = (float) feature.getDouble("pnni_50");
+            float AVNN = (float) feature.getDouble("mean_nni");
+            float TP = (float) time.getDouble("total_power");
+            float LF = (float) time.getDouble("lf");
+            float HF = (float) time.getDouble("hf");
+            float VLF = (float) time.getDouble("vlf");
+            float LF_HF = (float) time.getDouble("lf_hf_ratio");
+            float[] inputArr = {HR, Seconds, SDNN, rmssd, pNN50, AVNN, TP, LF, HF, VLF, LF_HF};
+            float[][] outputArr = new float[1][2];
+
+
+            tflite.run(inputArr, outputArr);
+            Log.d("Taaaa", outputArr.toString());
+
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -355,6 +385,19 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
 
     }
 
+    /** Memory-map the model file in Assets. */
+    private static MappedByteBuffer loadModelFile(AssetManager assets, String modelFilename)
+            throws IOException {
+        AssetFileDescriptor fileDescriptor = assets.openFd(modelFilename);
+        FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
+        FileChannel fileChannel = inputStream.getChannel();
+        long startOffset = fileDescriptor.getStartOffset();
+        long declaredLength = fileDescriptor.getDeclaredLength();
+        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
+    }
+
+
+
 
 
     @Override
@@ -424,5 +467,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
             this.data = data;
         }
     }
+
+
 
 }

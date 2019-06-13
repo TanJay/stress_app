@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="display_quote"
+        android:summaryOff="Hide Quote on Startup"
+        android:summaryOn="Display Quote on Startup"
+        android:title="Daily Quote"/>
+    <android.support.v7.preference.PreferenceCategory
+        android:title="Machine Learning">
+        <android.support.v7.preference.CheckBoxPreference
+            android:key="on_device_learning"
+            android:title="Use on Device Machine Learning"
+            android:summary="Process data offline without cloud storage"
+            android:defaultValue="true"/>
+        <android.support.v7.preference.SwitchPreferenceCompat
+            android:key="key1"
+            android:title="Switch Preference"
+            android:summary="Switch Summary"
+            android:defaultValue="true" />
+
+        <android.support.v7.preference.EditTextPreference
+            android:key="key2"
+            android:title="EditText Preference"
+            android:summary="EditText Summary"
+            android:dialogMessage="Dialog Message"
+            android:defaultValue="Default value" />
+
+    </android.support.v7.preference.PreferenceCategory>
+</PreferenceScreen>

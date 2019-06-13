@@ -28,7 +28,10 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -59,13 +62,14 @@ import java.io.IOException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import br.com.goncalves.pugnotification.notification.PugNotification;
 
-public class MainActivity extends AppCompatActivity implements HomeFragment.OnFragmentInteractionListener, ProfileFragment.OnFragmentInteractionListener, SessionFragment.OnFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity implements HomeFragment.OnFragmentInteractionListener, ProfileFragment.OnFragmentInteractionListener, SessionFragment.OnFragmentInteractionListener, SharedPreferences.OnSharedPreferenceChangeListener {
     public String TAG = "ELEMENT_TAG";
     public String TAG_NAME = "ELEMENT_TAG";
     public String PREFERENCE_NAME = "element";
@@ -84,6 +88,8 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
     List<Float> rRs = new ArrayList<>();
     private static final String MODEL_FILENAME = "file:///assets/element_litev2.tflite";
     Python py;
+    boolean showQuote = true;
+    boolean isOnDeviceML = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
         setContentView(R.layout.activity_main);
         String actualModelFilename = MODEL_FILENAME.split("file:///assets/", -1)[1];
         try {
-            tflite = new Interpreter(loadModelFile(getAssets(), actualModelFilename));
+            tflite = new Interpreter(loadModelFile(getAssets(), "element_lite.tflite"));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -118,11 +124,15 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
             float VLF = (float) time.getDouble("vlf");
             float LF_HF = (float) time.getDouble("lf_hf_ratio");
             float[] inputArr = {HR, Seconds, SDNN, rmssd, pNN50, AVNN, TP, LF, HF, VLF, LF_HF};
+            float[][] ar = new float[1][11];
+            ar[0] = inputArr;
             float[][] outputArr = new float[1][2];
-
-
+            Map<Integer, Object> outputMaps = new HashMap<>();
+            outputMaps.put(0, outputArr);
+//            tflite.resizeInput(0, new int[] {1, 11});
+//            tflite.run(ar, outputMaps);
             tflite.run(inputArr, outputArr);
-            Log.d("Taaaa", outputArr.toString());
+            Log.d("Taaaa", Arrays.toString(outputArr[0]));
 
 
         } catch (JSONException e) {
@@ -192,9 +202,41 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
         LocalBroadcastManager.getInstance(this).registerReceiver(disconnectReceiver,
                 new IntentFilter("disconnect_event"));
 
-        alert = new QuoteAlert();
-        getQuote(this);
 
+        setupSharedPreferences();
+
+
+    }
+
+    private void setupSharedPreferences() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+        showQuote = sharedPreferences.getBoolean("display_quote",true);
+        isOnDeviceML = sharedPreferences.getBoolean("on_device_learning",true);
+        if(showQuote) {
+            alert = new QuoteAlert();
+            getQuote(this);
+        }
+
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.settings_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+            startActivity(intent);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 
@@ -252,18 +294,55 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
             String[] items = message.split(",");
 
             WearableHRV hrv = new WearableHRV(items[0], Integer.valueOf(items[1]), Float.parseFloat(items[2]));
+
             //Date:2019-6-4 1:30:5,rrInterval:0,HR: -3
             list.add(hrv);
             rRs.add(Float.valueOf(items[1]));
             if (list.size() == 100){
-                predictDataByApi(list);
-                Log.d("Taaaa", py.getModule("main").callAttr("say_my_name", rRs).toString());
+                if(!isOnDeviceML) predictDataByApi(list);
+                else predictDataByOnDeviceML(rRs);
+//                Log.d("Taaaa", py.getModule("main").callAttr("say_my_name", rRs).toString());
                 list.clear();
                 rRs.clear();
             }
 
         }
     };
+
+    public void predictDataByOnDeviceML(List<Float> array){
+        float[] arr = new float[array.size()];
+//        array.stream().
+//        float[] arr = Arrays.copyOf(array, array.size(), float[].class);
+        int i = 0;
+        for (Iterator<Float> iterator = array.iterator(); iterator.hasNext(); i++) {
+            arr[i] = iterator.next();
+        }
+        try {
+            JSONArray obj = new JSONArray(py.getModule("main").callAttr("say_my_name", arr).toString());
+            JSONObject feature = obj.getJSONObject(0);
+            JSONObject time = obj.getJSONObject(1);
+            Log.d("Taaaa", String.valueOf(feature.getDouble("mean_nni")));
+            float HR = (float) feature.getDouble("mean_hr");
+            float Seconds = 10.0f;
+            float SDNN = (float) feature.getDouble("sdnn");
+            float rmssd = (float) feature.getDouble("rmssd");
+            float pNN50 = (float) feature.getDouble("pnni_50");
+            float AVNN = (float) feature.getDouble("mean_nni");
+            float TP = (float) time.getDouble("total_power");
+            float LF = (float) time.getDouble("lf");
+            float HF = (float) time.getDouble("hf");
+            float VLF = (float) time.getDouble("vlf");
+            float LF_HF = (float) time.getDouble("lf_hf_ratio");
+            float[] inputArr = {HR, Seconds, SDNN, rmssd, pNN50, AVNN, TP, LF, HF, VLF, LF_HF};
+            float[][] outputArr = new float[1][2];
+            tflite.run(inputArr, outputArr);
+            Log.d("Taaaa", Arrays.toString(outputArr[0]));
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public void predictDataByApi(List<WearableHRV> hrvData) {
         RequestQueue requestQueue = Volley.newRequestQueue(this);
@@ -422,6 +501,8 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
         }
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
         super.onDestroy();
+        android.support.v7.preference.PreferenceManager.getDefaultSharedPreferences(this)
+                .unregisterOnSharedPreferenceChangeListener(this);
     }
 
     private final ServiceConnection mConnection = new ServiceConnection() {
@@ -456,6 +537,15 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
 //        mTextView.setText(str);
         Log.d("TAGGGGGGG", "updateText");
 
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals("display_quote")) {
+            Log.d("Taaaa", String.valueOf(sharedPreferences.getBoolean("display_quote",true)));
+        }else if(key.equals("on_device_learning")){
+            isOnDeviceML = sharedPreferences.getBoolean("on_device_learning",true);
+        }
     }
 
 

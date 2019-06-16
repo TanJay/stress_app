@@ -6,6 +6,9 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -22,6 +25,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -42,6 +46,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.chaquo.python.PyException;
 import com.chaquo.python.PyObject;
 import com.chaquo.python.Python;
 import com.chaquo.python.android.AndroidPlatform;
@@ -61,6 +66,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -69,7 +76,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class MainActivity extends AppCompatActivity implements HomeFragment.OnFragmentInteractionListener, ProfileFragment.OnFragmentInteractionListener, SessionFragment.OnFragmentInteractionListener, SharedPreferences.OnSharedPreferenceChangeListener {
+public class MainActivity extends AppCompatActivity implements HomeFragment.OnFragmentInteractionListener, ProfileFragment.OnFragmentInteractionListener, SessionFragment.OnFragmentInteractionListener, SharedPreferences.OnSharedPreferenceChangeListener, StressChartFragment.OnFragmentInteractionListener {
     public String TAG = "ELEMENT_TAG";
     public String TAG_NAME = "ELEMENT_TAG";
     public String PREFERENCE_NAME = "element";
@@ -86,16 +93,17 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
     CharSequence name = "my_channel";
     String Description = "This is my channel";
     List<Float> rRs = new ArrayList<>();
-    private static final String MODEL_FILENAME = "file:///assets/element_litev2.tflite";
     Python py;
     boolean showQuote = true;
     boolean isOnDeviceML = false;
+    private StressViewModel stressViewModel;
+    private List<StressItem> stressItems;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        String actualModelFilename = MODEL_FILENAME.split("file:///assets/", -1)[1];
+
         try {
             tflite = new Interpreter(loadModelFile(getAssets(), "element_lite.tflite"));
         } catch (Exception e) {
@@ -105,44 +113,57 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
             Python.start(new AndroidPlatform(getApplicationContext()));
         }
         py = Python.getInstance();
-        float[] arr = {587,587,587,587,587,587,587,587,587,587,587,587,719,719,719,719,719,719,719,1145,1145,1145,1145,1145,1145,1145,1145,1145,1208,1208,1208,1208,841,841,841,841,841,841,841,841,594,594,634,634,634,634,634,634,634,634};
-        Log.d("Taaaa", py.getModule("main").callAttr("say_my_name", arr).toString());
-        try {
-            JSONArray obj = new JSONArray(py.getModule("main").callAttr("say_my_name", arr).toString());
-            JSONObject feature = obj.getJSONObject(0);
-            JSONObject time = obj.getJSONObject(1);
-            Log.d("Taaaa", String.valueOf(feature.getDouble("mean_nni")));
-            float HR = (float) feature.getDouble("mean_hr");
-            float Seconds = 10.0f;
-            float SDNN = (float) feature.getDouble("sdnn");
-            float rmssd = (float) feature.getDouble("rmssd");
-            float pNN50 = (float) feature.getDouble("pnni_50");
-            float AVNN = (float) feature.getDouble("mean_nni");
-            float TP = (float) time.getDouble("total_power");
-            float LF = (float) time.getDouble("lf");
-            float HF = (float) time.getDouble("hf");
-            float VLF = (float) time.getDouble("vlf");
-            float LF_HF = (float) time.getDouble("lf_hf_ratio");
-            float[] inputArr = {HR, Seconds, SDNN, rmssd, pNN50, AVNN, TP, LF, HF, VLF, LF_HF};
-            float[][] ar = new float[1][11];
-            ar[0] = inputArr;
-            float[][] outputArr = new float[1][2];
-            Map<Integer, Object> outputMaps = new HashMap<>();
-            outputMaps.put(0, outputArr);
-//            tflite.resizeInput(0, new int[] {1, 11});
-//            tflite.run(ar, outputMaps);
-            tflite.run(inputArr, outputArr);
-            Log.d("Taaaa", Arrays.toString(outputArr[0]));
-
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+//        float[] arr = {587,587,587,587,587,587,587,587,587,587,587,587,719,719,719,719,719,719,719,1145,1145,1145,1145,1145,1145,1145,1145,1145,1208,1208,1208,1208,841,841,841,841,841,841,841,841,594,594,634,634,634,634,634,634,634,634};
+//        Log.d("Taaaa", py.getModule("main").callAttr("say_my_name", arr).toString());
+//        try {
+//            JSONArray obj = new JSONArray(py.getModule("main").callAttr("say_my_name", arr).toString());
+//            JSONObject feature = obj.getJSONObject(0);
+//            JSONObject time = obj.getJSONObject(1);
+//            Log.d("Taaaa", String.valueOf(feature.getDouble("mean_nni")));
+//            float HR = (float) feature.getDouble("mean_hr");
+//            float Seconds = 10.0f;
+//            float SDNN = (float) feature.getDouble("sdnn");
+//            float rmssd = (float) feature.getDouble("rmssd");
+//            float pNN50 = (float) feature.getDouble("pnni_50");
+//            float AVNN = (float) feature.getDouble("mean_nni");
+//            float TP = (float) time.getDouble("total_power");
+//            float LF = (float) time.getDouble("lf");
+//            float HF = (float) time.getDouble("hf");
+//            float VLF = (float) time.getDouble("vlf");
+//            float LF_HF = (float) time.getDouble("lf_hf_ratio");
+//            float[] inputArr = {HR, Seconds, SDNN, rmssd, pNN50, AVNN, TP, LF, HF, VLF, LF_HF};
+//            float[][] ar = new float[1][11];
+//            ar[0] = inputArr;
+//            float[][] outputArr = new float[1][2];
+//            Map<Integer, Object> outputMaps = new HashMap<>();
+//            outputMaps.put(0, outputArr);
+////            tflite.resizeInput(0, new int[] {1, 11});
+////            tflite.run(ar, outputMaps);
+//            tflite.run(inputArr, outputArr);
+//            Log.d("Taaaa", Arrays.toString(outputArr[0]));
+//
+//
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
 
 
         notificationManager = (NotificationManager) MainActivity.this.getSystemService(Context.NOTIFICATION_SERVICE);
 
+        stressViewModel = ViewModelProviders.of(MainActivity.this).get(StressViewModel.class);
+        StressItem item = new StressItem(DateConverter.fromDate(new Date(System.currentTimeMillis())));
+//        stressViewModel.insert(item);
+        stressViewModel.deleteAll();
+        stressViewModel.getAllWords().observe(this, new Observer<List<StressItem>>() {
 
+            @Override
+            public void onChanged(@Nullable final List<StressItem> words) {
+                // Update the cached copy of the words in the adapter.
+//                adapter.setWords(words);
+                Log.d("Taaa", String.valueOf(words.size()));
+            }
+        });
+        Log.d("Taaa", String.valueOf(stressViewModel.getAllWords()));
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             int importance = NotificationManager.IMPORTANCE_HIGH;
             mChannel = new NotificationChannel(CHANNEL_ID, name, importance);
@@ -207,6 +228,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
 
 
     }
+
 
     private void setupSharedPreferences() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -310,35 +332,63 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
     };
 
     public void predictDataByOnDeviceML(List<Float> array){
-        float[] arr = new float[array.size()];
+        float[] arr = new float[array.size()+1];
 //        array.stream().
 //        float[] arr = Arrays.copyOf(array, array.size(), float[].class);
         int i = 0;
         for (Iterator<Float> iterator = array.iterator(); iterator.hasNext(); i++) {
             arr[i] = iterator.next();
         }
+        String arrq;
         try {
-            JSONArray obj = new JSONArray(py.getModule("main").callAttr("say_my_name", arr).toString());
-            JSONObject feature = obj.getJSONObject(0);
-            JSONObject time = obj.getJSONObject(1);
-            Log.d("Taaaa", String.valueOf(feature.getDouble("mean_nni")));
-            float HR = (float) feature.getDouble("mean_hr");
-            float Seconds = 10.0f;
-            float SDNN = (float) feature.getDouble("sdnn");
-            float rmssd = (float) feature.getDouble("rmssd");
-            float pNN50 = (float) feature.getDouble("pnni_50");
-            float AVNN = (float) feature.getDouble("mean_nni");
-            float TP = (float) time.getDouble("total_power");
-            float LF = (float) time.getDouble("lf");
-            float HF = (float) time.getDouble("hf");
-            float VLF = (float) time.getDouble("vlf");
-            float LF_HF = (float) time.getDouble("lf_hf_ratio");
-            float[] inputArr = {HR, Seconds, SDNN, rmssd, pNN50, AVNN, TP, LF, HF, VLF, LF_HF};
-            float[][] outputArr = new float[1][2];
-            tflite.run(inputArr, outputArr);
-            Log.d("Taaaa", Arrays.toString(outputArr[0]));
+            arrq = py.getModule("main").callAttr("say_my_name", arr).toString();
+            Log.d("Taaa", arrq);
+            try {
+                JSONArray obj = new JSONArray(arrq);
+                JSONObject feature = obj.getJSONObject(0);
+                JSONObject time = obj.getJSONObject(1);
+                Log.d("Taaaa", String.valueOf(feature.getDouble("mean_nni")));
+                float HR = (float) feature.getDouble("mean_hr");
+                float Seconds = 10.0f;
+                float SDNN = (float) feature.getDouble("sdnn");
+                float rmssd = (float) feature.getDouble("rmssd");
+                float pNN50 = (float) feature.getDouble("pnni_50");
+                float AVNN = (float) feature.getDouble("mean_nni");
+                float TP = (float) time.getDouble("total_power");
+                float LF = (float) time.getDouble("lf");
+                float HF = (float) time.getDouble("hf");
+                float VLF = (float) time.getDouble("vlf");
+                float LF_HF = (float) time.getDouble("lf_hf_ratio");
+                float[] inputArr = {HR, Seconds, SDNN, rmssd, pNN50, AVNN, TP, LF, HF, VLF, LF_HF};
+                float[][] outputArr = new float[1][2];
+                tflite.run(inputArr, outputArr);
+                Log.d("Taaaa", Arrays.toString(outputArr[0]));
+                try {
+                    int message = 1;
+                    if (outputArr[0][0] == 0.0f) {
+                        message = 0;
+                    }
+                    Intent intent = new Intent("stress_detection_event");
+                    intent.putExtra("message", message);
+                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+                    if (message > 0) {
+                        Toast.makeText(getApplicationContext(), "Stress", Toast.LENGTH_LONG).show();
 
-        } catch (JSONException e) {
+                        showNotification("Element", "Your are now stressed please listen to some beats");
+                    } else {
+                        Toast.makeText(getApplicationContext(), "No Stress", Toast.LENGTH_LONG).show();
+                    }
+                    Log.d(TAG_NAME, "Response");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(getApplicationContext(), "Register Failed Json", Toast.LENGTH_LONG).show();
+                }
+
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }catch (PyException e) {
             e.printStackTrace();
         }
     }
@@ -484,10 +534,21 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.OnFr
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+//        mConsumerService.sendData("stopservice");
+    }
+
     // SAAgent
     @Override
     protected void onDestroy() {
-        mConsumerService.sendData("stopservice");
+//        mConsumerService.sendData("stopservice");
         // Clean up connections
         if (mIsBound == true && mConsumerService != null) {
             if (mConsumerService.closeConnection() == false) {

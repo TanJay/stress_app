@@ -11,6 +11,6 @@ def preprocess(rr):
     interpolated_nn_intervals = interpolate_nan_values(rr_intervals=nn_intervals_list)
     return interpolated_nn_intervals
 
-def say_my_name(rr):
+def process(rr):
     pre = preprocess(rr)
     return [get_time_domain_features(pre), get_frequency_domain_features(pre)]

@@ -133,7 +133,7 @@ public class LogInActivity extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 loginButton.setEnabled(true);
-                Log.d(TAG_NAME, error.getMessage());
+//                Log.d(TAG_NAME, error.getMessage());
                 Toast.makeText(getApplicationContext(), "Login Failed1", Toast.LENGTH_LONG).show();
             }
         });

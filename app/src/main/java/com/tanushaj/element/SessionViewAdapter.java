@@ -1,6 +1,7 @@
 package com.tanushaj.element;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -60,6 +61,8 @@ public class SessionViewAdapter extends RecyclerView.Adapter<SessionViewAdapter.
         @Override
         public void onClick(View view) {
             if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
+            Intent intent = new Intent (view.getContext(), LevelActivity.class);
+            view.getContext().startActivity(intent);
         }
     }
 

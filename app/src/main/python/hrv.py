@@ -373,7 +373,7 @@ def get_time_domain_features(nn_intervals: List[float]) -> dict:
     diff_nni = np.diff(nn_intervals)
     length_int = len(nn_intervals)
 
-    # Basic statistics
+    # Basic statistics for element time domain
     mean_nni = np.mean(nn_intervals)
     median_nni = np.median(nn_intervals)
     range_nni = max(nn_intervals) - min(nn_intervals)

@@ -81,6 +81,9 @@ public class SessionFragment extends Fragment implements View.OnClickListener{
 
         liveFeedButton = view.findViewById(R.id.live_view_btn);
         liveFeedButton.setOnClickListener(this);
+
+
+
 //        Fragment
 
         FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();

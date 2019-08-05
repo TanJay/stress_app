@@ -82,10 +82,6 @@ public class LevelActivity extends AppCompatActivity implements View.OnClickList
             hrvDtos.add(hrvDto);
             List<HRVDto> selectedVisual = (hrvDtos.size() > 1000) ? hrvDtos.subList(hrvDtos.size()-1000, hrvDtos.size()) : hrvDtos;
             heartRateView.setAdapter(new HeartRateAdapter(selectedVisual));
-//            synchronized(heartRateView){
-//                heartRateView.notify();
-//            }
-//            heartRateView.notify();
         }
     };
 
@@ -125,7 +121,7 @@ public class LevelActivity extends AppCompatActivity implements View.OnClickList
                 playPauseBtn.setBackground(getDrawable(R.drawable.circle));
                 doubleBounce.start();
                 try {
-                    mp.setDataSource("https://sample-videos.com/audio/mp3/crowd-cheering.mp3");
+                    mp.setDataSource("https://elementapp.s3-ap-southeast-1.amazonaws.com/2298596870.wav");
                 } catch (Exception e) {
                     e.printStackTrace();
                     Log.d("TAGGGGG", e.getLocalizedMessage());

@@ -76,7 +76,6 @@ public class LiveViewAlert {
             int stress = intent.getIntExtra("message", -1);
             if(stress > 0){
                 stressBackground.setBackgroundColor(Color.RED);
-
                 stressText.setText("Stressed");
             }else{
                 stressBackground.setBackgroundColor(Color.GREEN);
